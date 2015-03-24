@@ -26,6 +26,7 @@ def pretty_print_alignment(prot_seq, peptides):
     :param peptides:
     :return:
     """
+    pep_lengths_and_start_posses = [(len(pep_seq), prot_seq.find(pep_seq)) for pep_seq in peptides]
     sorted_peps = sorted(peptides, key=lambda pep_seq: prot_seq.find(pep_seq))
 
     first_start_pos = prot_seq.find(sorted_peps[0])
@@ -157,8 +158,8 @@ def main(prot_prophet_xml, protein_db_name):
     :param prot_prophet_xml:
     :param protein_db_name:
     """
-    protein_db = SeqIO.index(protein_db_name, format='fasta')
 
+    protein_db = SeqIO.index(protein_db_name, format='fasta')
     parse_results_folder = "parse_results/"
     weblogos_output_folder = 'weblogos_results/'
     readable_out_file = parse_results_folder + 'sorted_prots.txt'
@@ -167,20 +168,20 @@ def main(prot_prophet_xml, protein_db_name):
 
     prot_xml_parser = ProtXMLParser(parse_results_folder, prot_prophet_xml)
 
-    error_rates_dict = prot_xml_parser.get_statistics_dict()  # min_probability:false_positive_error_rate
+    statistics_dict = prot_xml_parser.get_statistics_dict()  # {min_probability: false_positive_error_rate}
     prots = prot_xml_parser.get_prots()
 
     weblogo_generator = WebLogoGenerator(weblogos_output_folder)
 
-    save_readable_prot_infos_min_prob(error_rates_dict[0.004], prots, protein_db, readable_out_file)
+    save_readable_prot_infos_min_prob(statistics_dict[0.004], prots, protein_db, readable_out_file)
 
-    # Test to human readble
-    find_metap_activity(min_prob=error_rates_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
-                        write_to_fasta=True, fasta_out=metap_act_out_fasta_file,
-                        readable_out=readable_metap_act_out_file,
-                        prots=prots, protein_db=protein_db)
-    # Test fasta out
-    find_metap_activity(min_prob=error_rates_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
+    # Test fasta output
+    # find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
+    #                     write_to_fasta=True, fasta_out=metap_act_out_fasta_file,
+    #                     readable_out=readable_metap_act_out_file,
+    #                     prots=prots, protein_db=protein_db)
+    # Test human readable output
+    find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
                         write_to_fasta=False, fasta_out=metap_act_out_fasta_file,
                         readable_out=readable_metap_act_out_file,
                         prots=prots, protein_db=protein_db)
@@ -188,5 +189,6 @@ def main(prot_prophet_xml, protein_db_name):
     weblogo_generator.create_weblogo(metap_act_out_fasta_file)
 
 
-main("GitHub_test_files/raw.comet.interact.prot.xml",
-     'GitHub_test_files/Uniprot_Mt_proteome.fasta')
+if __name__ == '__main__':
+    main("GitHub_test_files/raw.comet.interact.prot.xml",
+         'GitHub_test_files/Uniprot_Mt_proteome.fasta')

@@ -101,13 +101,13 @@ class ProtProphHit(object):
     @staticmethod
     def set_peptides(prot_group):
         peptides = []
-        for pep in prot_group.protein.getchildren():
+        for prot_child in prot_group.protein.getchildren():
             # We are only interested in peptides with an initial_probability higher then 0
-            if pep.tag[-7:] == 'peptide' and float(pep.attrib["initial_probability"]) > 0:
+            if prot_child.tag[-7:] == 'peptide' and float(prot_child.attrib["initial_probability"]) > 0:
 
                 # To avoid duplicate peptides detected on different charges
-                if pep.attrib["peptide_sequence"] not in [peptide.get_seq() for peptide in peptides]:
-                    peptides.append(Peptide(pep.attrib))
+                if prot_child.attrib["peptide_sequence"] not in [peptide.get_seq() for peptide in peptides]:
+                    peptides.append(Peptide(prot_child.attrib))
 
         return peptides
 
