@@ -13,6 +13,7 @@ Instructions:
  - Within the weblogolib rename all _winreg references to -> winreg
  - Install ghostscript: http://pages.cs.wisc.edu/~ghost/
     - On Windows: Add ghostscript to your system PATH
+ - Install Numpy: http://sourceforge.net/projects/numpy/files/NumPy/1.9.2/
 """
 
 
