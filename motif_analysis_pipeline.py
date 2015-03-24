@@ -12,7 +12,10 @@ from WebLogoGenerator import WebLogoGenerator
 
 """
 Jeroen Merks
-....
+
+Instructions:
+ - Install BioPython 1.65: http://biopython.org/wiki/Download
+
 """
 
 
