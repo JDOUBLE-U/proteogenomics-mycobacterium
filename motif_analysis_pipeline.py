@@ -185,6 +185,5 @@ def main(prot_prophet_xml, protein_db_name):
     weblogo_generator.create_weblogo(metap_act_out_fasta_file)
 
 
-# TODO create test-cases
-main("Mycobacterium_tuberculosis/comet.interact.ipro.prot.xml",
-     'Mycobacterium_tuberculosis/uniprot-proteome_3AUP000001584.fasta')
+main("GitHub_test_files/raw.comet.interact.prot.xml",
+     'GitHub_test_files/Uniprot_Mt_proteome.fasta')
