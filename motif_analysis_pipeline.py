@@ -42,7 +42,7 @@ def pretty_print_alignment(prot_seq, peptides):
     return prot_seq, alignment
 
 
-def get_prots(min_prob, prot_groups):
+def get_prots_min(min_prob, prot_groups):
     matching_prots = []
     for prot_group in prot_groups:
         for prot in prot_group.get_prots():
@@ -71,7 +71,7 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
 
     # Check if probability falls between 0 and 1
     if 1 >= min_prob > 0:
-        matching_prots = get_prots(min_prob, prot_groups)
+        matching_prots = get_prots_min(min_prob, prot_groups)
         # Sort matches on probability
         sorted_matching_prot_hits = sorted(matching_prots, key=lambda protein: protein.get_prob(), reverse=True)
     else:
@@ -87,9 +87,8 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
         print('None of the proteins met the given critera.')
 
 
-def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, write_to_fasta, fasta_out,
-                        readable_out,
-                        prot_groups, protein_db):
+def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, readable_out, prot_groups,
+                        protein_db, fasta_out, write_to_fasta):
     """
 
     :param min_prob:
@@ -111,35 +110,35 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
 
     # Check if probability falls between 0 and 1
     if 1 >= min_prob > 0:
-        matching_prots = get_prots(min_prob, prot_groups)
+        matching_prots = get_prots_min(min_prob, prot_groups)
 
         # Sort matches on probability
-        matching_hits = sorted(matching_prots, key=lambda protgroup: protgroup.get_prob(),
-                               reverse=True)
+        sorten_matching_hits = sorted(matching_prots, key=lambda protgroup: protgroup.get_prob(),
+                                      reverse=True)
     else:
         sys.exit('Min probability must range between 0 and 1.')
 
-    if len(matching_hits) > 0:
+    if len(sorten_matching_hits) > 0:
 
         if write_to_fasta:
             output_handler = open(fasta_out, "w")
         else:
             file = open(readable_out, "w")
 
-        for prot in matching_hits:
+        for prot in sorten_matching_hits:
             for pept in prot.get_peptides():
 
                 if prot.get_seq(protein_db).find(pept.get_seq()) == cleavage_loc:
                     found_metap_activity = True
 
                     if write_to_fasta:
+                        # Write a multiple fasta file with proteïs within the given motif range
                         prot_seq = SeqRecord(
                             Seq.Seq(prot.get_seq(protein_db)[motif_range_start:motif_range_end], generic_protein),
                             id=prot.get_id(), description=prot.get_descr())
                         SeqIO.write(prot_seq, output_handler, "fasta")
                     else:
-                        file.write('Nr of proteins matching criteria: %i\n' % len(matching_prots))
-                        file.write('\n')
+                        file.write('Nr of proteins matching criteria: %i\n\n' % len(matching_prots))
                         write_readable_results(file, prot, protein_db)
 
         if not found_metap_activity:
@@ -175,14 +174,12 @@ def main(prot_prophet_xml, protein_db_name):
 
     # Test fasta output
     find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
-                        write_to_fasta=True, fasta_out=metap_act_out_fasta_file,
-                        readable_out=readable_metap_act_out_file,
-                        prot_groups=prots, protein_db=protein_db)
+                        readable_out=readable_metap_act_out_file, prot_groups=prots, protein_db=protein_db,
+                        fasta_out=metap_act_out_fasta_file, write_to_fasta=True)
     # Test human readable output
     find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
-                        write_to_fasta=False, fasta_out=metap_act_out_fasta_file,
-                        readable_out=readable_metap_act_out_file,
-                        prot_groups=prot_groups, protein_db=protein_db)
+                        readable_out=readable_metap_act_out_file, prot_groups=prot_groups, protein_db=protein_db,
+                        fasta_out=metap_act_out_fasta_file, write_to_fasta=False)
 
     weblogo_generator.create_weblogo(metap_act_out_fasta_file)
 
