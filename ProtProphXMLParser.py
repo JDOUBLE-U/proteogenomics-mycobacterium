@@ -6,7 +6,8 @@ from lxml import objectify
 
 """
 Jeroen Merks
-
+Instructions:
+ - Install lxml 3.4.2: https://pypi.python.org/pypi/lxml/
 ...
 """
 
