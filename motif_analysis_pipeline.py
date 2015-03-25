@@ -21,12 +21,12 @@ Instructions:
 
 def pretty_print_alignment(prot_seq, peptides):
     """
+    # TODO fix alligning overlapping peptides
 
     :param prot_seq:
     :param peptides:
     :return:
     """
-    pep_lengths_and_start_posses = [(len(pep_seq), prot_seq.find(pep_seq)) for pep_seq in peptides]
     sorted_peps = sorted(peptides, key=lambda pep_seq: prot_seq.find(pep_seq))
 
     first_start_pos = prot_seq.find(sorted_peps[0])
@@ -42,44 +42,47 @@ def pretty_print_alignment(prot_seq, peptides):
     return prot_seq, alignment
 
 
+def get_prots(min_prob, prot_groups):
+    matching_prots = []
+    for prot_group in prot_groups:
+        for prot in prot_group.get_prots():
+            if prot.get_prob() >= min_prob:
+                matching_prots.append(prot)
+    return matching_prots
+
+
+def write_readable_results(file, prot, protein_db):
+    file.write('Protein ID: %s\n' % prot.get_id())
+    file.write('Protein description: %s\n' % prot.get_descr())
+    file.write('Probability: %f\n' % prot.get_prob())
+    file.write("%s\n%s\n" % (
+        pretty_print_alignment(prot.get_seq(protein_db), [pep.get_seq() for pep in prot.get_peptides()])))
+    file.write('\n')
+
+
 def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readable_prot_file):
     """
-
 
     :param readable_prot_file:
     :param protein_db:
     :param prot_groups:
     :param min_prob:
     """
-    matching_prots = []
 
     # Check if probability falls between 0 and 1
     if 1 >= min_prob > 0:
-        for prot_group in prot_groups:
-            for prot in prot_group.get_prots():
-                if prot.get_prob() >= min_prob:
-                    matching_prots.append(prot)
-
+        matching_prots = get_prots(min_prob, prot_groups)
         # Sort matches on probability
         sorted_matching_prot_hits = sorted(matching_prots, key=lambda protein: protein.get_prob(), reverse=True)
     else:
         sys.exit('Min probability must range between 0 and 1.')
 
     if len(sorted_matching_prot_hits) > 0:
-        out_file = open(readable_prot_file, "w")
-        out_file.write('Nr of proteins matching criteria: %i\n' % len(matching_prots))
-        out_file.write('\n')
-
+        file = open(readable_prot_file, "w")
+        file.write('Nr of proteins matching criteria: %i\n' % len(matching_prots))
+        file.write('\n')
         for prot in sorted_matching_prot_hits:
-            out_file.write('Protein ID: %s\n' % prot.get_id())
-            out_file.write('Protein description: %s\n' % prot.get_descr())
-            out_file.write('Probability: %f\n' % prot.get_prob())
-            out_file.write("%s\n%s\n" % (
-                pretty_print_alignment(prot.get_seq(protein_db), [pep.get_seq() for pep in prot.get_peptides()])))
-            out_file.write('\n')
-
-        out_file.close()
-
+            write_readable_results(file, prot, protein_db)
     else:
         print('None of the proteins met the given critera.')
 
@@ -99,7 +102,7 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
     :param prot_groups:
     :param protein_db:
     """
-    matching_prot_hits = []
+
     found_metap_activity = False
 
     # Check if cleavage location is valid
@@ -108,26 +111,22 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
 
     # Check if probability falls between 0 and 1
     if 1 >= min_prob > 0:
-        for prot_group in prot_groups:
-            for prot in prot_group.get_prots():
-                if prot.get_prob() >= min_prob:
-                    matching_prot_hits.append(prot)
+        matching_prots = get_prots(min_prob, prot_groups)
 
         # Sort matches on probability
-        sorted_matching_protgroup_hits = sorted(matching_prot_hits, key=lambda protgroup: protgroup.get_prob(),
-                                                reverse=True)
-
+        matching_hits = sorted(matching_prots, key=lambda protgroup: protgroup.get_prob(),
+                               reverse=True)
     else:
         sys.exit('Min probability must range between 0 and 1.')
 
-    if len(sorted_matching_protgroup_hits) > 0:
+    if len(matching_hits) > 0:
 
         if write_to_fasta:
             output_handler = open(fasta_out, "w")
         else:
             file = open(readable_out, "w")
 
-        for prot in sorted_matching_protgroup_hits:
+        for prot in matching_hits:
             for pept in prot.get_peptides():
 
                 if prot.get_seq(protein_db).find(pept.get_seq()) == cleavage_loc:
@@ -139,13 +138,9 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
                             id=prot.get_id(), description=prot.get_descr())
                         SeqIO.write(prot_seq, output_handler, "fasta")
                     else:
-                        file.write('Protein ID: %s\n' % prot.get_id())
-                        file.write('Protein description: %s\n' % prot.get_descr())
-                        file.write('Probability: %f\n' % prot.get_prob())
-                        file.write("%s\n%s\n" % (
-                            pretty_print_alignment(prot.get_seq(protein_db),
-                                                   [pep.get_seq() for pep in prot.get_peptides()])))
+                        file.write('Nr of proteins matching criteria: %i\n' % len(matching_prots))
                         file.write('\n')
+                        write_readable_results(file, prot, protein_db)
 
         if not found_metap_activity:
             print("No metap-activity has been detected!")
