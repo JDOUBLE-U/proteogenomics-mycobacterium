@@ -1,1 +1,1 @@
-# proteogenomics-mycobacterium
+# proteogenomics-mycrobacterium
