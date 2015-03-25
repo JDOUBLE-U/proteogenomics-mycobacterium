@@ -11,7 +11,7 @@ Jeroen Merks
 """
 
 
-class ProtXMLParser(object):
+class ProtXMLParser():
     """
 
     :param parse_results_folder:
@@ -24,24 +24,24 @@ class ProtXMLParser(object):
 
         self.PARSE_RESULTS_FOLDER = parse_results_folder
         self.PROT_PROPHET_XML = prot_prophet_xml
-        self.prots = self.get_prots()
+        self.prot_groups = self.get_prot_groups()
         self.statistics_dict = self.get_statistics_dict()
 
-    def get_prots(self):
+    def get_prot_groups(self):
         """
         Extracts groups of proteins by looping through the "protein_group" XML-elements of the prot.xml file.
 
         :return: list
         """
-        prots = []
+        prot_groups = []
         prot_prophet_xml_object = open(self.PROT_PROPHET_XML, encoding="utf-8")
         prot_prophet_xml_object.readline()  # skip XML encoding declaration
-        for prot in objectify.fromstring(prot_prophet_xml_object.read()).protein_group:
-            prots.append(ProtProphHit(prot))
+        for prot_group in objectify.fromstring(prot_prophet_xml_object.read()).protein_group:
+            prot_groups.append(ProteinGroup(prot_group))
 
         prot_prophet_xml_object.close()
 
-        return prots
+        return prot_groups
 
     def get_statistics_dict(self):
         """
@@ -67,58 +67,93 @@ class ProtXMLParser(object):
         return statistics_dict
 
 
-class ProtProphHit(object):
+class ProteinGroup():
     """
 
-    :param prot:
+    :param prot_group:
     """
 
+    def __init__(self, prot_group):
+        self.prob = float(prot_group.attrib["probability"])
+        self.group_nr = int(prot_group.attrib["group_number"])
+
+        # Not all protein_groups have a pseudo name
+        try:
+            self.pseudo_name = int(prot_group.attrib["pseudo_name"])
+        except KeyError:
+            self.pseudo_name = None
+
+        self.prots = self.set_prots(prot_group)
+
+    @staticmethod
+    def set_prots(prot_group):
+        prots = []
+        for prot_group_child in prot_group.getchildren():
+            if prot_group_child.tag[-7:] == 'protein':
+                prots.append(Protein(prot_group_child))
+
+        return prots
+
+    def get_prots(self):
+        return self.prots
+
+
+class Protein():
     def __init__(self, prot):
+        self.prot_name = prot.attrib["protein_name"]
+        self.desc = prot.annotation.attrib["protein_description"]
         self.prob = float(prot.attrib["probability"])
-        self.conf = float(prot.protein.attrib["confidence"])
-        self.group_nr = int(prot.attrib["group_number"])
-        self.id = prot.protein.attrib["protein_name"]
-        self.description = prot.protein.annotation.attrib["protein_description"]
-        self.nr_peptides = int(prot.protein.attrib["total_number_distinct_peptides"])
+        self.conf = float(prot.attrib["confidence"])
+        self.nr_peptides = int(prot.attrib["total_number_distinct_peptides"])
+        self.group_sibling_id = prot.attrib["group_sibling_id"]
 
         # No peptides -> no coverage, duh!
         try:
-            self.cov = prot.protein.attrib["percent_coverage"]
+            self.cov = prot.attrib["percent_coverage"]
         except KeyError:
             self.cov = 0
 
         # There's not always a spectrum id?
         try:
-            self.spec_ids = float(prot.protein.attrib["pct_spectrum_ids"])
+            self.spec_ids = float(prot.attrib["pct_spectrum_ids"])
         except KeyError:
             self.spec_ids = None
 
         self.peptides = self.set_peptides(prot)
 
-    def get_goup_nr(self):
-        return self.group_nr
+        if "indistinguishable_protein" in [prot_child.tag[-25:] for prot_child in prot.getchildren()]:
+            self.indistinguishable_proteins = self.set_indistinguishable_proteins(prot)
 
     @staticmethod
-    def set_peptides(prot_group):
+    def set_peptides(prot):
         peptides = []
-        for prot_child in prot_group.protein.getchildren():
+        for prot_child in prot.getchildren():
             # We are only interested in peptides with an initial_probability higher then 0
             if prot_child.tag[-7:] == 'peptide' and float(prot_child.attrib["initial_probability"]) > 0:
 
                 # To avoid duplicate peptides detected on different charges
                 if prot_child.attrib["peptide_sequence"] not in [peptide.get_seq() for peptide in peptides]:
-                    peptides.append(Peptide(prot_child.attrib))
+                    peptides.append(Peptide(prot_child))
 
         return peptides
 
-    def get_descr(self):
-        return self.description
+    @staticmethod
+    def set_indistinguishable_proteins(protein):
+        indistinguishable_proteins = []
+        for prot_child in protein.getchildren():
+            if prot_child.tag[-25:] == 'indistinguishable_protein':
+                indistinguishable_proteins.append(prot_child.attrib)
+
+        return indistinguishable_proteins
 
     def get_id(self):
-        return self.id
+        return self.prot_name
+
+    def get_descr(self):
+        return self.desc
 
     def get_seq(self, protein_db):
-        return str(protein_db[self.id].seq)
+        return str(protein_db[self.prot_name].seq)
 
     def get_prob(self):
         return self.prob
@@ -127,27 +162,35 @@ class ProtProphHit(object):
         return self.peptides
 
 
-class Peptide(object):
+class Peptide():
     """
 
-    :param peptide_attributes:
+    :param peptide:
     """
 
-    def __init__(self, peptide_attributes):
-        self.seq = peptide_attributes["peptide_sequence"]
-        self.charge = peptide_attributes["charge"]
-        self.initial_prob = peptide_attributes["initial_probability"]
-        self.nsp_prob = peptide_attributes["nsp_adjusted_probability"]
-        self.fpkm_prob = peptide_attributes["nsp_adjusted_probability"]
+    def __init__(self, peptide):
+        self.seq = peptide.attrib["peptide_sequence"]
+        self.charge = peptide.attrib["charge"]
+        self.initial_prob = peptide.attrib["initial_probability"]
+        self.nsp_prob = peptide.attrib["nsp_adjusted_probability"]
+        self.fpkm_prob = peptide.attrib["nsp_adjusted_probability"]
 
-        self.is_contrib_evidence = peptide_attributes["is_contributing_evidence"]
-        if self.is_contrib_evidence == "Y":
+        if peptide.attrib["is_contributing_evidence"] == "Y":
             self.is_contributing_evidence = True
         else:
             self.is_contributing_evidence = False
 
+        if "peptide_parent_protein" in [pep_child.tag[-22:] for pep_child in peptide.getchildren()]:
+            self.peptide_parent_proteins = self.set_peptide_parent_proteins(peptide)
+
+    @staticmethod
+    def set_peptide_parent_proteins(peptide):
+        parent_proteins = []
+        for peptide_child in peptide.getchildren():
+            if peptide_child.tag[-22:] == 'peptide_parent_protein':
+                parent_proteins.append(peptide_child.attrib)
+
+        return parent_proteins
+
     def get_seq(self):
         return self.seq
-
-    def get_charge(self):
-        return self.charge

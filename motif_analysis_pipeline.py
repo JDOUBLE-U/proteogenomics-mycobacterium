@@ -42,22 +42,23 @@ def pretty_print_alignment(prot_seq, peptides):
     return prot_seq, alignment
 
 
-def save_readable_prot_infos_min_prob(min_prob, prots, protein_db, readable_prot_file):
+def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readable_prot_file):
     """
 
 
     :param readable_prot_file:
     :param protein_db:
-    :param prots:
+    :param prot_groups:
     :param min_prob:
     """
     matching_prots = []
 
     # Check if probability falls between 0 and 1
     if 1 >= min_prob > 0:
-        for prot in prots:
-            if prot.get_prob() >= min_prob:
-                matching_prots.append(prot)
+        for prot_group in prot_groups:
+            for prot in prot_group.get_prots():
+                if prot.get_prob() >= min_prob:
+                    matching_prots.append(prot)
 
         # Sort matches on probability
         sorted_matching_prot_hits = sorted(matching_prots, key=lambda protein: protein.get_prob(), reverse=True)
@@ -85,7 +86,7 @@ def save_readable_prot_infos_min_prob(min_prob, prots, protein_db, readable_prot
 
 def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, write_to_fasta, fasta_out,
                         readable_out,
-                        prots, protein_db):
+                        prot_groups, protein_db):
     """
 
     :param min_prob:
@@ -95,7 +96,7 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
     :param write_to_fasta:
     :param fasta_out:
     :param readable_out:
-    :param prots:
+    :param prot_groups:
     :param protein_db:
     """
     matching_prot_hits = []
@@ -107,9 +108,10 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
 
     # Check if probability falls between 0 and 1
     if 1 >= min_prob > 0:
-        for prot in prots:
-            if prot.get_prob() >= min_prob:
-                matching_prot_hits.append(prot)
+        for prot_group in prot_groups:
+            for prot in prot_group.get_prots():
+                if prot.get_prob() >= min_prob:
+                    matching_prot_hits.append(prot)
 
         # Sort matches on probability
         sorted_matching_protgroup_hits = sorted(matching_prot_hits, key=lambda protgroup: protgroup.get_prob(),
@@ -169,22 +171,23 @@ def main(prot_prophet_xml, protein_db_name):
     prot_xml_parser = ProtXMLParser(parse_results_folder, prot_prophet_xml)
 
     statistics_dict = prot_xml_parser.get_statistics_dict()  # {min_probability: false_positive_error_rate}
-    prots = prot_xml_parser.get_prots()
+    prot_groups = prot_xml_parser.get_prot_groups()
+    prots = [prot for prot in prot_groups]
 
     weblogo_generator = WebLogoGenerator(weblogos_output_folder)
 
     save_readable_prot_infos_min_prob(statistics_dict[0.004], prots, protein_db, readable_out_file)
 
     # Test fasta output
-    # find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
-    #                     write_to_fasta=True, fasta_out=metap_act_out_fasta_file,
-    #                     readable_out=readable_metap_act_out_file,
-    #                     prots=prots, protein_db=protein_db)
+    find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
+                        write_to_fasta=True, fasta_out=metap_act_out_fasta_file,
+                        readable_out=readable_metap_act_out_file,
+                        prot_groups=prots, protein_db=protein_db)
     # Test human readable output
     find_metap_activity(min_prob=statistics_dict[0.004], cleavage_loc=2, motif_range_start=0, motif_range_end=5,
                         write_to_fasta=False, fasta_out=metap_act_out_fasta_file,
                         readable_out=readable_metap_act_out_file,
-                        prots=prots, protein_db=protein_db)
+                        prot_groups=prot_groups, protein_db=protein_db)
 
     weblogo_generator.create_weblogo(metap_act_out_fasta_file)
 
