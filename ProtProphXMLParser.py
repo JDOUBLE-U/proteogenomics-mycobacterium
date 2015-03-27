@@ -28,10 +28,6 @@ class ProtXMLParser():
         self.prot_groups = self.get_prot_groups()
         self.statistics_dict = self.get_statistics_dict()
 
-        self.prot_prophet_xml_object = open(self.PROT_PROPHET_XML, encoding="utf-8")
-        self.prot_prophet_xml_object.readline()  # skip XML encoding declaration
-        self.objectified_from_str = objectify.fromstring(self.prot_prophet_xml_object)
-
     def get_prot_groups(self):
         """
         Extracts groups of proteins by looping through the "protein_group" XML-elements of the prot.xml file.
@@ -39,8 +35,12 @@ class ProtXMLParser():
         :return: list
         """
         prot_groups = []
-        for prot_group in self.objectified_from_str.protein_group:
+        prot_prophet_xml_object = open(self.PROT_PROPHET_XML, encoding="utf-8")
+        prot_prophet_xml_object.readline()  # skip XML encoding declaration
+        for prot_group in objectify.fromstring(prot_prophet_xml_object.read()).protein_group:
             prot_groups.append(ProteinGroup(prot_group))
+
+        prot_prophet_xml_object.close()
 
         return prot_groups
 
@@ -50,13 +50,20 @@ class ProtXMLParser():
         :return:
         """
         statistics_dict = {}
-        for data_filter in self.objectified_from_str.protein_summary_header.program_details.proteinprophet_details.getchildren():
+        prot_prophet_xml_object = open(self.PROT_PROPHET_XML, encoding="utf-8")
+        prot_prophet_xml_object.readline()  # skip XML encoding declaration
+        for data_filter in objectify.fromstring(
+                prot_prophet_xml_object.read()). \
+                protein_summary_header.program_details.proteinprophet_details.getchildren():
 
             # We are only interested in protein_summary_data
             if data_filter.tag[-27:] == 'protein_summary_data_filter':
                 min_probability = float(data_filter.attrib["min_probability"])
                 error_rate = float(data_filter.attrib["false_positive_error_rate"])
+
                 statistics_dict[error_rate] = min_probability
+
+        prot_prophet_xml_object.close()
 
         return statistics_dict
 
