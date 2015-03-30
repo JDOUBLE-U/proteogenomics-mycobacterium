@@ -31,7 +31,5 @@ seqLogo="/home/BPSYS/seqLogo.jpeg"
 #This python-script makes sequence logo's.
 python "/home/BPSYS/s1071701/WebLogo.py" ${seq_file_1} ${seqLogo}
 
-comet -p
-
 /home/janwillem/Desktop/comet_binaries_2015011/comet.2015011.linux.exe MM.mzXML -Pcomet.params.new -DMycobacterium_marinum_strain_ATCC_BAA_535.fasta
 
