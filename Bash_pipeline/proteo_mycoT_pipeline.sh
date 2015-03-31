@@ -32,11 +32,14 @@ seqLogo="/home/BPSYS/seqLogo.jpeg"
 
 #This command is PeptideProphet
 runprophet interact.htm
+#xinteract
+#cd c:/Inetpub/wwwroot/ISB/data/parameters& c:\Inetpub\tpp-bin\xinteract -N141215.LC2.IT2.MM.S03749_1-C,1_01_7095_interact_daltons.pep.xml -p0.05 -l7 -OA 141215.LC2.IT2.MM.S03749_1-C,1_01_7095.tandem.pep.xml 
 
 #This command is ProteinProphet.
 #usage:	ProteinProphet.pl '<interact pep prob html file1><interact pep prob html file2>....' <outfile> (ICAT) (GLYC) (XPRESS) (ASAP_PROPHET) (ACCURACY) (ASAP) (REFRESH) (DELUDE) (NOOCCAM)
 perl ProteinProphet.pl
-
+#runphrophet
+#c:\Inetpub\tpp-bin\ProteinProphet c:/Inetpub/wwwroot/ISB/data/parameters/141215.lc2.it2.mm.s03749_1-c,1_01_7095_interact_daltons.pep.xml c:/Inetpub/wwwroot/ISB/data/parameters/interact.prot.xml 
 
 
 #This python-script makes sequence logo's.
