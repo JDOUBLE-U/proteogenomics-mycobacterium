@@ -21,7 +21,7 @@ def cleave_only(prot_db_name_in):
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
-    processed_comet_file_name = prot_db_name_in[:-6] + "_comet-cleaved-only.fasta"
+    processed_comet_file_name = prot_db_name_in[:-(len(".fasta"))] + "_comet_cleaved_only.fasta"
 
     with open(processed_comet_file_name, "w+") as comet_processed_db_out:
         # Add the virtually cleaved proteins
@@ -36,7 +36,7 @@ def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
-    processed_comet_file_name = prot_db_name_in[:-6] + "_comet-digested-cleaved.fasta"
+    processed_comet_file_name = prot_db_name_in[:-6] + "_comet_digested_and_cleaved.fasta"
 
     # # Make a copy of the original database
     # shutil.copy2(prot_db_name_in, processed_comet_file_name)
@@ -48,7 +48,7 @@ def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
         for original_seq_req in protein_db_in:
             processed_seq = get_digests(cleave_m(str(original_seq_req.seq)), nr_allowed_overdigestions)
 
-            # Only save processed sequences with a minnimum length
+            # Only save processed protein sequences with a minnimum length
             if len(str(processed_seq)) >= min_seq_len:
                 # if nr_allowed_overdigestions == 0:
                 #     custom_descr = "M-CLEAVED_TRYPSIN-DIGESTED_NO_OVERDIGESTION"
@@ -65,4 +65,4 @@ def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
 if __name__ == '__main__':
     # cleave_and_digest("../" + "GitHub_test_files/uniprot-organism3A-mycobacterium-tuberculosis_proteins.fasta", 5, 1)
     # cleave_only("../" + "GitHub_test_files/Mycobacterium_marinum_proteome.fasta")
-    cleave_only("../" + "GitHub_test_files/Mycobacterium_marinum_proteome_six_frame.fasta")
+    cleave_only("../" + "GitHub_test_files/Mycobacterium_marinumproteome_six_frame.fasta")

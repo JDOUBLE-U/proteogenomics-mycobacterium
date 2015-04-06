@@ -5,12 +5,13 @@ from Bio import SeqIO
 from Comet_analysis_pipeline.ProtProphXMLParser import ProtProphXMLParser
 from Comet_analysis_pipeline.ProtProphXMLParser import ProteinGroup
 
+# TODO make file references relative
 
 class TestProtXMLParser(TestCase):
     # Check if all protein groups get properly fetched and return correct group numbers and probabilities
     def test_get_prot_groups(self):
         protxmlparser = ProtProphXMLParser
-        protxmlparser.prot_prophet_xml = "C:/Users/Jeroen/IdeaProjects/BPSYS/tests/uninit_tests/prophet_test_xml.xml"
+        protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
 
         prot_groups = protxmlparser.get_prot_groups(protxmlparser)
 
@@ -27,7 +28,7 @@ class TestProtXMLParser(TestCase):
     # proper min_probability rates
     def test_get_statistics_dict(self):
         protxmlparser = ProtProphXMLParser
-        protxmlparser.prot_prophet_xml = "C:/Users/Jeroen/IdeaProjects/BPSYS/tests/uninit_tests/prophet_test_xml.xml"
+        protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
 
         statistics_dict = protxmlparser.get_error_prob_pairs(protxmlparser)
 
@@ -39,7 +40,7 @@ class TestProteinGroup(TestCase):
     def test_set_and_get_prot_groups(self):
 
         protxmlparser = ProtProphXMLParser
-        protxmlparser.prot_prophet_xml = "C:/Users/Jeroen/IdeaProjects/BPSYS/tests/uninit_tests/prophet_test_xml.xml"
+        protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
 
         # Check if nr of proteins in group 0 is correct
         self.assertEqual(len(protxmlparser.get_prot_groups(protxmlparser)[0].get_prots()), 2)
@@ -59,8 +60,8 @@ class TestProteinGroup(TestCase):
 class TestProtein(TestCase):
     def test_test_get_peptide(self):
         protxmlparser = ProtProphXMLParser
-        test_prot_db = SeqIO.index("C:/Users/Jeroen/IdeaProjects/BPSYS/tests/uninit_tests/prot_test_db", format='fasta')
-        protxmlparser.prot_prophet_xml = "C:/Users/Jeroen/IdeaProjects/BPSYS/tests/uninit_tests/prophet_test_xml.xml"
+        test_prot_db = SeqIO.index("./GitHub_test_files/prot_test_db", format='fasta')
+        protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
         prot_groups = protxmlparser.get_prot_groups(protxmlparser)
 
         group0prot0 = prot_groups[0].get_prots()[0]

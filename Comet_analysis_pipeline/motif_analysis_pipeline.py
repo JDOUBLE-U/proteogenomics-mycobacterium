@@ -4,9 +4,7 @@ import os
 import sys
 
 from Bio.Alphabet import generic_protein
-
 from Bio.SeqRecord import SeqRecord
-
 from Bio.Seq import Seq
 
 from Bio import SeqIO
@@ -46,10 +44,13 @@ def pretty_print_alignment(prot_seq, peptides):
 
 def get_prots_min(min_prob, prot_groups):
     matching_prots = []
+
     for prot_group in prot_groups:
         for prot in prot_group.get_prots():
+
             if prot.get_prob() >= min_prob:
                 matching_prots.append(prot)
+
     return matching_prots
 
 
@@ -75,6 +76,7 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
     if 1 > min_prob or min_prob < 0:
         matching_prots = get_prots_min(min_prob, prot_groups)
         # Sort matches on probability
+        # TODO check if this is even necessary, ProteinProphet seems to sort on probability by default?
         sorted_matching_prot_hits = sorted(matching_prots, key=lambda protein: protein.get_prob(), reverse=True)
     else:
         sys.exit('Min probability must range between 0 and 1.')
@@ -100,20 +102,21 @@ def sort_hits(min_prob, prot_groups):
         sorten_matching_hits = sorted(matching_prots, key=lambda protgroup: protgroup.get_prob(), reverse=True)
     else:
         sys.exit('Min probability must range between 0 and 1.')
+
     return matching_prots, sorten_matching_hits
 
 
 def save_results(write_to_fasta, motif_range_end, motif_range_start,
                  prot, protein_db, out_file):
+
     if write_to_fasta:
-        # Write a multiple fasta file with proteïs within the given motif range
+        # Write a multiple fasta file with proteis within the given motif range
         prot_seq = SeqRecord(
-            Seq(prot.get_seq(protein_db)[motif_range_start:motif_range_end],
-                generic_protein), id=prot.get_prot_name(),
+            Seq(prot.get_seq(protein_db)[motif_range_start:motif_range_end], generic_protein),
+            id=prot.get_prot_name(),
             description=prot.get_descr())
         SeqIO.write(prot_seq, out_file, "fasta")
-    # out_file.write(">%s %s\n%s\n" % (
-    #   prot.get_prot_name(), prot.get_descr(), prot.get_seq(protein_db)[motif_range_start:motif_range_end]))
+
     else:
         write_readable_results(out_file, prot, protein_db)
 
@@ -217,14 +220,14 @@ def main(prot_prophet_xml, protein_db_name):
 
     save_readable_prot_infos_min_prob(choosen_prob, prots, protein_db, readable_out_file)
 
-    # Test fasta output
+    # Fasta output, for WebComet
     find_metap_activity(min_prob=choosen_prob, cleavage_loc=1,
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,
                         prot_groups=prots, protein_db=protein_db,
                         fasta_out=metap_act_out_fasta_file,
                         write_to_fasta=True)
-    # Test human readable output
+    # Human readable output
     find_metap_activity(min_prob=choosen_prob, cleavage_loc=1,
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,
@@ -236,5 +239,5 @@ def main(prot_prophet_xml, protein_db_name):
 
 
 if __name__ == '__main__':
-    main("../" + "GitHub_test_files/six_frame_cleaved.comet.default.141215.interact.prot.xml",
-         '../' + 'GitHub_test_files/Mycobacterium_marinum_proteome_six_frame.fasta')
+    main("../" + "GitHub_test_files/six_frame_cleaved.comet.min_5.141215.interact.prot.xml",
+         '../' + 'GitHub_test_files/Mycobacterium_marinumproteome_six_frame.fasta')
