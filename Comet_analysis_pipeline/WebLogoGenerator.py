@@ -36,7 +36,7 @@ class WebLogoGenerator():
         self.weblogo_options.number_fontsize = 6
         self.weblogo_options.fontsize = 6
         self.weblogo_options.stack_aspect_ratio = 12
-        self.weblogo_options.yaxis_scale = 1.7
+        self.weblogo_options.yaxis_scale = 1.5
         self.weblogo_options.stack_width = std_sizes["medium"]
 
     def create_weblogo(self, target_proteins):
