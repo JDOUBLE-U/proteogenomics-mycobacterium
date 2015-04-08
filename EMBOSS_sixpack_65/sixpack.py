@@ -4,7 +4,7 @@ import os
 import sys
 
 """
-The program takes the following steps:
+ The program takes the following steps:
 
  The nucleic acid sequence is read in.
  The required genetic code is read in from the EGC* data files.
@@ -76,4 +76,4 @@ def main(genome):
               % (genome, CODON_TABLE, visual_out, out_file, on_platform, min_protein_len))
 
 
-main("../" + "GitHub_test_files/Mycobacterium_marinum_genome.fasta")
+main(genome="../" + "GitHub_test_files/Mycobacterium_marinum_genome.fasta")

@@ -8,5 +8,5 @@ setup(
     license='',
     author='',
     author_email='',
-    description='', requires=['lxml', 'numpy', "biopython", "weblogo", 'Comet']
+    description='', requires=['lxml', 'numpy', "biopython", "weblogo"]
 )
