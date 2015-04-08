@@ -6,6 +6,7 @@ import sys
 from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+
 from Bio import SeqIO
 
 from ProteinProphetParser.ProtProphXMLParser import ProtProphXMLParser
@@ -72,7 +73,7 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
     """
 
     # Check if probability falls between 0 and 1
-    if 1 > min_prob or min_prob < 0:
+    if 1 > min_prob or min_prob > 0:
         matching_prots = get_prots_min(min_prob, prot_groups)
         # Sort matches on probability
         # TODO check if this is even necessary, ProteinProphet seems to sort on probability by default?
@@ -94,7 +95,7 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
 
 def sort_hits(min_prob, prot_groups):
     # Check if probability falls between 0 and 1
-    if 1 > min_prob or min_prob < 0:
+    if 1 > min_prob or min_prob > 0:
         matching_prots = get_prots_min(min_prob, prot_groups)
 
         # Sort matches on probability
