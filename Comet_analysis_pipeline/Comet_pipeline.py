@@ -78,7 +78,7 @@ if __name__ == '__main__':
              5)
     else:
         main(None,
-             "../" + "GitHub_test_files/Mt_genome.fasta",
-             get_mzxmls("../" + "GitHub_test_files/Uniprot_Mt_proteome.fasta"),
+             "../" + "GitHub_test_files/Uniprot_Mt_proteome.fasta",
+             get_mzxmls("../" + "Local_test_files/"),
              False,
              5)

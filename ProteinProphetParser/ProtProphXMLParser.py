@@ -134,8 +134,7 @@ class Protein():
         # We are only interested in peptides with an initial_probability
         # higher then 0
         element_name = 'peptide'
-        if prot_child.tag[-len(element_name):] == element_name and \
-                        float(prot_child.attrib["initial_probability"]) > 0:
+        if prot_child.tag[-len(element_name):] == element_name and float(prot_child.attrib["initial_probability"]) > 0:
 
             # To avoid duplicate peptides detected on different charges
             if prot_child.attrib["peptide_sequence"] not in [peptide.get_seq() for peptide in peptides]:
