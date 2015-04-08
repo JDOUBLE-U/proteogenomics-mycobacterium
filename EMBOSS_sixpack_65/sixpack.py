@@ -1,7 +1,6 @@
 __author__ = 'Jeroen'
 
 import os
-import sys
 
 """
  The program takes the following steps:
@@ -19,11 +18,12 @@ import sys
  Any ORFs that are longer than the specified minimum size are written to the output sequence file.
 """
 
-CODON_TABLE = 11  # Bacterial codon table
+CODON_TABLE = 11  # Bacterial codon table (by NCBI standards)
 
 
 def choose_min_prot_length():
-    print("What is the minimum protein length allowed?")
+    print("What is the minimum protein length allowed? "
+          "Keep in mind the n-terminus will optionally be cleaved after this step.")
     return int(input(">>> "))
 
 
@@ -36,20 +36,16 @@ def choose_mandatory_M():
         return ""
 
 
-def main(genome):
-    out_file = genome[:-len("_genome.fasta")] + "proteome_six_frame.fasta"
+def run_sixpack(genome_file, executable, on_platform):
+    out_file = "../" + "Comet_analysis_pipeline/sixpack_out" + genome_file[genome_file.rfind("/"):-len(
+        ".fasta")] + "proteome_six_frame.fasta"
     visual_out = out_file[:-len(".fasta")] + ".txt"
 
-    on_platform = sys.platform
-    if on_platform == 'win32':
-        sixpack_command = "windows_sixpack.exe"
-    else:
-        sixpack_command = "./sixpack"
-
+    print("EMBOSS Sixpack")
     min_protein_len = choose_min_prot_length()
 
     # TODO perhaps add the "features format -fformat1" parameter for custom fasta descriptors?
-    os.system(sixpack_command + " -sequence %s"
+    os.system(executable + " -sequence %s"
                                 " -sformat1 fasta "
                                 " -snucleotide1"
                                 " -supper1 "
@@ -73,7 +69,6 @@ def main(genome):
                                 " -auto"
                                 " -verbose"
                                 " -mstart"  # Make optional?
-              % (genome, CODON_TABLE, visual_out, out_file, on_platform, min_protein_len))
+              % (genome_file, CODON_TABLE, visual_out, out_file, on_platform, min_protein_len))
 
-
-main(genome="../" + "GitHub_test_files/Mycobacterium_marinum_genome.fasta")
+    return out_file

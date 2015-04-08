@@ -6,7 +6,6 @@ import sys
 from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
-
 from Bio import SeqIO
 
 from ProteinProphet.ProtProphXMLParser import ProtProphXMLParser
@@ -237,8 +236,3 @@ def main(prot_prophet_xml, protein_db_name):
                         write_to_fasta=False)
 
     weblogo_generator.create_weblogo(metap_act_out_fasta_file)
-
-
-if __name__ == '__main__':
-    main(prot_prophet_xml="../" + "GitHub_test_files/six_frame_cleaved.comet.min_5.141215.interact.prot.xml",
-         protein_db_name='../' + 'GitHub_test_files/Mycobacterium_marinumproteome_six_frame.fasta')

@@ -16,19 +16,23 @@ def cleave_m(sequence):
         return sequence
 
 
-def cleave_only(prot_db_name_in):
-    # Parse the db instead of indexing it, because faster and we are going to append linearly anyway
+def cleave_M_only(prot_db_name_in):
+    print("Pre-processing database")
+
+    # Parse the db instead of indexing it, because this is faster and we are going to append linearly anyway
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
-    processed_comet_file_name = prot_db_name_in[:-(len(".fasta"))] + "_comet_cleaved_only.fasta"
+    out_file = "../" "Comet_analysis_pipeline/preprocess_out" + prot_db_name_in[prot_db_name_in.rfind("/"):-(
+    len(".fasta"))] + "_comet_cleaved_only.fasta"
 
-    with open(processed_comet_file_name, "w+") as comet_processed_db_out:
+    with open(out_file, "w+") as comet_processed_db_out:
         # Add the virtually cleaved proteins
         for original_seq_req in protein_db_in:
             cleaved_seq = cleave_m(str(original_seq_req.seq))
             comet_processed_db_out.write(
                 ">%s %s\n%s\n" % (original_seq_req.id, original_seq_req.description, cleaved_seq))
+    return out_file
 
 
 def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
@@ -60,8 +64,3 @@ def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
 
                 comet_processed_db_out.write(
                     ">%s %s\n%s\n" % (original_seq_req.id, original_seq_req.description, processed_seq))
-
-
-if __name__ == '__main__':
-    # cleave_and_digest("../" + "GitHub_test_files/uniprot-organism3A-mycobacterium-tuberculosis_proteins.fasta", 5, 1)
-    cleave_only(prot_db_name_in="../" + "GitHub_test_files/Mycobacterium_marinumproteome_six_frame.fasta")
