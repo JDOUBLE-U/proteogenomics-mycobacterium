@@ -3,11 +3,8 @@ __author__ = 'Jeroen'
 import os
 
 
-def xinteract(pep_proph_exec, pep_xmls, min_pep_length):
+def xinteract(ms_run_code, pep_proph_exec, pep_xmls, min_pep_length):
     print("Starting xinteract")
-
-    first_xml = pep_xmls[0]
-    ms_run_code = first_xml[first_xml.rfind("/") + 1:first_xml.rfind(",")]
 
     interact_absolute_out_path = os.getcwd() + "\\xinteract_out\\" + ms_run_code + ".pep.xml"
 

@@ -21,12 +21,12 @@ Jeroen Merks
 
 def pretty_print_alignment(prot_seq, peptides):
     """
-    # TODO fix alligning overlapping peptides
 
     :param prot_seq:
     :param peptides:
     :return:
     """
+    # TODO fix alligning overlapping peptides
     sorted_peps = sorted(peptides, key=lambda pep_seq: prot_seq.find(pep_seq))
 
     first_start_pos = prot_seq.find(sorted_peps[0])
@@ -83,8 +83,7 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
 
     if len(sorted_matching_prot_hits) > 0:
         file = open(readable_prot_file, "w")
-        file.write(
-            'Nr of proteins matching criteria: %i\n' % len(matching_prots))
+        file.write('Nr of proteins matching criteria: %i\n' % len(matching_prots))
         file.write('\n')
         for prot in sorted_matching_prot_hits:
             write_readable_results(file, prot, protein_db)
@@ -108,7 +107,6 @@ def sort_hits(min_prob, prot_groups):
 
 def save_results(write_to_fasta, motif_range_end, motif_range_start,
                  prot, protein_db, out_file):
-
     if write_to_fasta:
         # Write a multiple fasta file with proteis within the given motif range
         prot_seq = SeqRecord(
@@ -196,7 +194,7 @@ def choose_prob(error_prob_pairs):
     return error_prob_pairs[int(input(">>> ")) - 1][1]
 
 
-def main(prot_prophet_xml, protein_db_name):
+def main(ms_run_code, prot_prophet_xml, protein_db_name):
     """
 
     :param prot_prophet_xml:
@@ -208,9 +206,9 @@ def main(prot_prophet_xml, protein_db_name):
     protein_db = SeqIO.index(protein_db_name, format='fasta')
     parse_results_folder = "parsing_out/"
     weblogos_output_folder = 'weblogo_out/'
-    readable_out_file = parse_results_folder + protxml_name + 'sorted_prots.txt'
-    readable_metap_act_out_file = parse_results_folder + protxml_name + 'sorted_metap_activity_human_readable.txt'
-    metap_act_out_fasta_file = parse_results_folder + protxml_name + 'sorted_metap_activity.fasta'
+    readable_out_file = parse_results_folder + protxml_name + ms_run_code + '_sorted_prots.txt'
+    readable_metap_act_out_file = parse_results_folder + protxml_name + ms_run_code + '_human_readable.txt'
+    metap_act_out_fasta_file = parse_results_folder + protxml_name + ms_run_code + '.fasta'
 
     prot_xml_parser = ProtProphXMLParser(parse_results_folder, prot_prophet_xml)
     statistics = prot_xml_parser.get_error_prob_pairs()

@@ -47,6 +47,7 @@ class WebLogoGenerator():
         :param target_proteins: str
         """
         aa_seqs = read_seq_data(open(target_proteins))
+
         raw_data = LogoData.from_seqs(aa_seqs)
 
         weblogo_format = LogoFormat(raw_data, self.weblogo_options)

@@ -24,7 +24,7 @@ def cleave_M_only(prot_db_name_in):
 
     # Remove the .fasta suffix and give the new db a proper name
     procesed_db = "../" "Comet_analysis_pipeline/preprocessed_db_out" + prot_db_name_in[prot_db_name_in.rfind("/"):-(
-    len(".fasta"))] + "_comet_cleaved_only.fasta"
+        len(".fasta"))] + "_comet_cleaved_only.fasta"
 
     with open(procesed_db, "w+") as comet_processed_db_out:
         # Add the virtually cleaved proteins
