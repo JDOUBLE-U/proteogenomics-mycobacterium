@@ -4,7 +4,7 @@ import re
 from Bio import SeqIO
 
 
-def get_digests(sequence, nr_allowed_overdigestions):
+def get_digests(sequence, nr_allowed_overdigestions=2):
     digests = re.findall(r".(?:(?<![KR](?!P)).)*", sequence)
     return "".join(list(itertools.chain(digests[0:nr_allowed_overdigestions + 1])))
 
@@ -23,16 +23,16 @@ def cleave_M_only(prot_db_name_in):
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
-    out_file = "../" "Comet_analysis_pipeline/preprocess_out" + prot_db_name_in[prot_db_name_in.rfind("/"):-(
+    procesed_db = "../" "Comet_analysis_pipeline/preprocessed_db_out" + prot_db_name_in[prot_db_name_in.rfind("/"):-(
     len(".fasta"))] + "_comet_cleaved_only.fasta"
 
-    with open(out_file, "w+") as comet_processed_db_out:
+    with open(procesed_db, "w+") as comet_processed_db_out:
         # Add the virtually cleaved proteins
         for original_seq_req in protein_db_in:
             cleaved_seq = cleave_m(str(original_seq_req.seq))
             comet_processed_db_out.write(
                 ">%s %s\n%s\n" % (original_seq_req.id, original_seq_req.description, cleaved_seq))
-    return out_file
+    return procesed_db
 
 
 def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
@@ -40,7 +40,7 @@ def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
-    processed_comet_file_name = prot_db_name_in[:-6] + "_comet_digested_and_cleaved.fasta"
+    processed_comet_file_name = prot_db_name_in[:-len(".fasta")] + "_comet_digested_and_cleaved.fasta"
 
     # # Make a copy of the original database
     # shutil.copy2(prot_db_name_in, processed_comet_file_name)

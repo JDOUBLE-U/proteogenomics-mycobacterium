@@ -4,7 +4,6 @@ import os
 import sys
 import fnmatch
 import xml.etree.cElementTree as et
-
 from contextlib import contextmanager
 
 from radon.visitors import Function

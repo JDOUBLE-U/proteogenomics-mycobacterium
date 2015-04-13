@@ -8,7 +8,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 from Bio import SeqIO
 
-from ProteinProphet.ProtProphXMLParser import ProtProphXMLParser
+from ProteinProphetParser.ProtProphXMLParser import ProtProphXMLParser
 from WebLogo.WebLogoGenerator import WebLogoGenerator
 
 
@@ -205,11 +205,11 @@ def main(prot_prophet_xml, protein_db_name):
     protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("/"):prot_prophet_xml.rfind(".")]
 
     protein_db = SeqIO.index(protein_db_name, format='fasta')
-    parse_results_folder = "parsing_results/"
-    weblogos_output_folder = 'weblogos_result/'
-    readable_out_file = parse_results_folder + protxml_name + '.sorted_prots.txt'
-    readable_metap_act_out_file = parse_results_folder + protxml_name + '.sorted_metap_activity_human_readable.txt'
-    metap_act_out_fasta_file = parse_results_folder + protxml_name + '.sorted_metap_activity.fasta'
+    parse_results_folder = "parsing_out/"
+    weblogos_output_folder = 'weblogo_out/'
+    readable_out_file = parse_results_folder + protxml_name + 'sorted_prots.txt'
+    readable_metap_act_out_file = parse_results_folder + protxml_name + 'sorted_metap_activity_human_readable.txt'
+    metap_act_out_fasta_file = parse_results_folder + protxml_name + 'sorted_metap_activity.fasta'
 
     prot_xml_parser = ProtProphXMLParser(parse_results_folder, prot_prophet_xml)
     statistics = prot_xml_parser.get_error_prob_pairs()
@@ -217,10 +217,10 @@ def main(prot_prophet_xml, protein_db_name):
     prots = [prot for prot in prot_xml_parser.get_prot_groups()]
     weblogo_generator = WebLogoGenerator(weblogos_output_folder)
 
-    # Write all results with a given min_prob, for transparency sake
+    # Write all hits with a given minimum, for transparency sake
     save_readable_prot_infos_min_prob(choosen_prob, prots, protein_db, readable_out_file)
 
-    # Fasta output, for WebComet
+    # Fasta output, for WebLogo
     find_metap_activity(min_prob=choosen_prob, cleavage_loc=1,
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,

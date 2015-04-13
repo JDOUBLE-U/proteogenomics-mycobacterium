@@ -37,38 +37,38 @@ def choose_mandatory_M():
 
 
 def run_sixpack(genome_file, executable, on_platform):
-    out_file = "../" + "Comet_analysis_pipeline/sixpack_out" + genome_file[genome_file.rfind("/"):-len(
-        ".fasta")] + "proteome_six_frame.fasta"
-    visual_out = out_file[:-len(".fasta")] + ".txt"
+    fasta_out = "../" + "Comet_analysis_pipeline/sixpack_out" + genome_file[genome_file.rfind("/"):-len(
+        ".fasta")] + "_six_frame.fasta"
+    visual_out = fasta_out[:-len(".fasta")] + ".txt"
 
-    print("EMBOSS Sixpack")
+    print("Running EMBOSS Sixpack")
     min_protein_len = choose_min_prot_length()
 
     # TODO perhaps add the "features format -fformat1" parameter for custom fasta descriptors?
     os.system(executable + " -sequence %s"
-                                " -sformat1 fasta "
-                                " -snucleotide1"
-                                " -supper1 "
-                                " -table %i"
-                                " -firstorf "
-                                " -lastorf "
-                                " -outfile %s"
-                                " -outseq %s"
-                                " -osformat fasta "
-                                " -osname %s"
-                                " -reverse "
-                                " -orfminsize %i"
-                                " -number "
-                                " -width 120 "
-                                " -length 0 "
-                                " -margin 10 "
-                                " -name "
-                                " -description "
-                                " -offset 1 "
-                                " -nohtml "
-                                " -auto"
-                                " -verbose"
-                                " -mstart"  # Make optional?
-              % (genome_file, CODON_TABLE, visual_out, out_file, on_platform, min_protein_len))
+                           " -sformat1 fasta"
+                           " -snucleotide1"
+                           " -supper1"
+                           " -table %i"
+                           " -firstorf"
+                           " -lastorf"
+                           " -outfile %s"
+                           " -outseq %s"
+                           " -osformat fasta"
+                           " -osname %s"
+                           " -reverse"
+                           " -orfminsize %i"
+                           " -number"
+                           " -width 120"
+                           " -length 0"
+                           " -margin 10"
+                           " -name"
+                           " -description"
+                           " -offset 1"
+                           " -nohtml"
+                           " -auto"
+                           " -verbose"
+                           " -mstart"  # Make optional?
+              % (genome_file, CODON_TABLE, visual_out, fasta_out, on_platform, min_protein_len))
 
-    return out_file
+    return fasta_out

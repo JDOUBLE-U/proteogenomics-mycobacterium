@@ -7,17 +7,15 @@ def xinteract(pep_proph_exec, pep_xmls, min_pep_length):
     print("Starting xinteract")
 
     first_xml = pep_xmls[0]
-    spectra_run_code = first_xml[first_xml.rfind("/"):first_xml.rfind(",")]
+    ms_run_code = first_xml[first_xml.rfind("/") + 1:first_xml.rfind(",")]
 
-    interact_pep_xml_file = "../" + "Comet_analysis_pipeline/xinteract_out" + spectra_run_code + ".interact.prot.xml"
-    # print("pep_proph_out +", interact_pep_xml_file)
+    interact_absolute_out_path = os.getcwd() + "\\xinteract_out\\" + ms_run_code + ".pep.xml"
 
-    os.system(pep_proph_exec + " -p0.05"
+    os.system(pep_proph_exec + " -THREADS=7"
+                               " -OpA"
                                " -l%i"
-    # " -PPM" Accurate Mass Mode ?
-                               " -Op"
                                " -N%s"
                                " %s"
-              % (min_pep_length, interact_pep_xml_file, " ".join(pep_xmls)))
+              % (min_pep_length, interact_absolute_out_path, " ".join(pep_xmls)))
 
-    return interact_pep_xml_file
+    return interact_absolute_out_path
