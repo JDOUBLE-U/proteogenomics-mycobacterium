@@ -59,7 +59,7 @@ class ProtProphXMLParser():
         for data_filter in objectify.fromstring(prot_prophet_xml_object.read()).protein_summary_header.program_details. \
                 proteinprophet_details.getchildren():
 
-            # We are only interested in protein_summary_data
+            # We are only interested in protein_summary_data in the protein_summary_data_filter element
             if data_filter.tag[-len(element_name):] == element_name:
                 min_probability = float(data_filter.attrib["min_probability"])
                 error_rate = float(data_filter.attrib["false_positive_error_rate"])
@@ -80,7 +80,7 @@ class ProteinGroup():
         self.prob = float(prot_group.attrib["probability"])
         self.group_nr = int(prot_group.attrib["group_number"])
 
-        # Not all protein_groups have a pseudo name
+        # Not all protein_groups have pseudo names
         try:
             self.pseudo_name = int(prot_group.attrib["pseudo_name"])
         except KeyError:
@@ -132,7 +132,7 @@ class Protein():
     @staticmethod
     def child_is_peptide(peptides, prot_child):
         # We are only interested in peptides with an initial_probability
-        # higher then 0
+        # of at least > 0
         element_name = 'peptide'
         if prot_child.tag[-len(element_name):] == element_name and float(prot_child.attrib["initial_probability"]) > 0:
 

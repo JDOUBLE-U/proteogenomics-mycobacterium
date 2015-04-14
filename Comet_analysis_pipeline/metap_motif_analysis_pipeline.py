@@ -6,7 +6,6 @@ import sys
 from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
-
 from Bio import SeqIO
 
 from ProteinProphetParser.ProtProphXMLParser import ProtProphXMLParser
@@ -54,7 +53,7 @@ def get_prots_min(min_prob, prot_groups):
     return matching_prots
 
 
-def write_readable_results(file, prot, protein_db):
+def write_human_readable_results(file, prot, protein_db):
     file.write('Protein ID: %s\n' % prot.get_prot_name())
     file.write('Protein description: %s\n' % prot.get_descr())
     file.write('Probability: %f\n' % prot.get_prob())
@@ -86,7 +85,7 @@ def save_readable_prot_infos_min_prob(min_prob, prot_groups, protein_db, readabl
         file.write('Nr of proteins matching criteria: %i\n' % len(matching_prots))
         file.write('\n')
         for prot in sorted_matching_prot_hits:
-            write_readable_results(file, prot, protein_db)
+            write_human_readable_results(file, prot, protein_db)
         file.close()
     else:
         print('None of the proteins met the given critera.')
@@ -116,21 +115,26 @@ def save_results(write_to_fasta, motif_range_end, motif_range_start,
         SeqIO.write(prot_seq, out_file, "fasta")
 
     else:
-        write_readable_results(out_file, prot, protein_db)
+        write_human_readable_results(out_file, prot, protein_db)
 
 
-def create_out_file(fasta_out, readable_out, write_to_fasta):
+def create_append_out_file(fasta_out, readable_out, write_to_fasta):
     if write_to_fasta:
         if os.path.exists(fasta_out):
             os.remove(fasta_out)
         out_file = open(fasta_out, "a+")
-
     else:
         if os.path.exists(readable_out):
             os.remove(readable_out)
         out_file = open(readable_out, "a+")
 
     return out_file
+
+
+def create_out_folder(out_folder):
+    if not os.path.exists(out_folder):
+        os.mkdir(out_folder)
+    return out_folder
 
 
 def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
@@ -155,16 +159,16 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
     if cleavage_loc < 0:
         sys.exit('The cleavage site has to be on a position > 0.')
 
-    matching_prots, sorted_matching_hits = sort_hits(min_prob, prot_groups)
+    matching_prots, matching_prot_hits = sort_hits(min_prob, prot_groups)
 
-    if len(sorted_matching_hits) > 0:
+    if len(matching_prot_hits) > 0:
 
-        out_file = create_out_file(fasta_out, readable_out, write_to_fasta)
+        out_file = create_append_out_file(fasta_out, readable_out, write_to_fasta)
 
-        for prot in sorted_matching_hits:
-            for pept in prot.get_peptides():
+        for prot in matching_prot_hits:
+            for pep in prot.get_peptides():
 
-                pep_pos = prot.get_seq(protein_db).find(pept.get_seq())
+                pep_pos = prot.get_seq(protein_db).find(pep.get_seq())
                 if pep_pos == cleavage_loc:
                     found_metap_activity = True
                     save_results(write_to_fasta, motif_range_end,
@@ -204,30 +208,30 @@ def main(ms_run_code, prot_prophet_xml, protein_db_name):
     protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("/"):prot_prophet_xml.rfind(".")]
 
     protein_db = SeqIO.index(protein_db_name, format='fasta')
-    parse_results_folder = "parsing_out/"
-    weblogos_output_folder = 'weblogo_out/'
+    parse_results_folder = create_out_folder("parsing_out/")
+    weblogos_output_folder = create_out_folder('weblogo_out/')
     readable_out_file = parse_results_folder + protxml_name + ms_run_code + '_sorted_prots.txt'
     readable_metap_act_out_file = parse_results_folder + protxml_name + ms_run_code + '_human_readable.txt'
     metap_act_out_fasta_file = parse_results_folder + protxml_name + ms_run_code + '.fasta'
 
     prot_xml_parser = ProtProphXMLParser(parse_results_folder, prot_prophet_xml)
     statistics = prot_xml_parser.get_error_prob_pairs()
-    choosen_prob = choose_prob(statistics)
+    chosen_prob = choose_prob(statistics)
     prots = [prot for prot in prot_xml_parser.get_prot_groups()]
     weblogo_generator = WebLogoGenerator(weblogos_output_folder)
 
     # Write all hits with a given minimum, for transparency sake
-    save_readable_prot_infos_min_prob(choosen_prob, prots, protein_db, readable_out_file)
+    save_readable_prot_infos_min_prob(chosen_prob, prots, protein_db, readable_out_file)
 
     # Fasta output, for WebLogo
-    find_metap_activity(min_prob=choosen_prob, cleavage_loc=1,
+    find_metap_activity(min_prob=chosen_prob, cleavage_loc=1,
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,
                         prot_groups=prots, protein_db=protein_db,
                         fasta_out=metap_act_out_fasta_file,
                         write_to_fasta=True)
     # Human readable output
-    find_metap_activity(min_prob=choosen_prob, cleavage_loc=1,
+    find_metap_activity(min_prob=chosen_prob, cleavage_loc=1,
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,
                         prot_groups=prots, protein_db=protein_db,

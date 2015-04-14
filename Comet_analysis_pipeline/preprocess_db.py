@@ -5,6 +5,7 @@ from Bio import SeqIO
 
 
 def get_digests(sequence, nr_allowed_overdigestions=2):
+    # Default allowed overdigestion of Comet is 2 as well
     digests = re.findall(r".(?:(?<![KR](?!P)).)*", sequence)
     return "".join(list(itertools.chain(digests[0:nr_allowed_overdigestions + 1])))
 
@@ -16,15 +17,15 @@ def cleave_m(sequence):
         return sequence
 
 
-def cleave_M_only(prot_db_name_in):
-    print("Pre-processing database")
+def cleave_m_only(prot_db_name_in):
+    print("Cleaving the M's of the protein database")
 
     # Parse the db instead of indexing it, because this is faster and we are going to append linearly anyway
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
     procesed_db = "../" "Comet_analysis_pipeline/preprocessed_db_out" + prot_db_name_in[prot_db_name_in.rfind("/"):-(
-        len(".fasta"))] + "_comet_cleaved_only.fasta"
+        len(".fasta"))] + "_comet_M_cleaved_only.fasta"
 
     with open(procesed_db, "w+") as comet_processed_db_out:
         # Add the virtually cleaved proteins
