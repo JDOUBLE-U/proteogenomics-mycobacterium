@@ -36,15 +36,12 @@ def cleave_m_only(prot_db_name_in):
     return procesed_db
 
 
-def cleave_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
+def cleave_m_and_digest(prot_db_name_in, min_seq_len, nr_allowed_overdigestions):
     # Parse the db instead of indexing it, because faster and we are going to append linearly anyway
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db a proper name
     processed_comet_file_name = prot_db_name_in[:-len(".fasta")] + "_comet_digested_and_cleaved.fasta"
-
-    # # Make a copy of the original database
-    # shutil.copy2(prot_db_name_in, processed_comet_file_name)
 
     # Append the virtually cleaved and trypsin digested proteins into the copied file
     with open(processed_comet_file_name, "a+") as comet_processed_db_out:

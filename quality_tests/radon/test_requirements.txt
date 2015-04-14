@@ -1,7 +1,0 @@
-paramunittest
-coverage
-coveralls
-tox
-nose
-mock
-mando

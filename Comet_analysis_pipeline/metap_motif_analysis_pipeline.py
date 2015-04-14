@@ -6,10 +6,11 @@ import sys
 from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+
 from Bio import SeqIO
 
 from ProteinProphetParser.ProtProphXMLParser import ProtProphXMLParser
-from WebLogo.WebLogoGenerator import WebLogoGenerator
+from WebLogo33.WebLogoGenerator import WebLogoGenerator
 
 
 """

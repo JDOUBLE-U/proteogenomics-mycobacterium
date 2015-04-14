@@ -3,7 +3,7 @@ __author__ = 'Jeroen'
 import os
 
 
-def xinteract(ms_run_code, pep_proph_exec, pep_xmls, min_pep_length):
+def run_xinteract(ms_run_code, pep_proph_exec, pep_xmls, min_pep_length):
     print("Starting xinteract")
 
     interact_absolute_out_path = os.getcwd() + "\\xinteract_out\\" + ms_run_code + ".pep.xml"
@@ -15,4 +15,5 @@ def xinteract(ms_run_code, pep_proph_exec, pep_xmls, min_pep_length):
                                " %s"
               % (min_pep_length, interact_absolute_out_path, " ".join(pep_xmls)))
 
-    return interact_absolute_out_path
+    # glitch of xinteract, doesnt save in upper-case
+    return interact_absolute_out_path.lower()
