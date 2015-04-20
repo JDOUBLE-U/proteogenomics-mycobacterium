@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://C:/Python34/Lib/site-packages/lxml/lxml.iml" filepath="C:/Python34/Lib/site-packages/lxml/lxml.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/proteogenomics-mycobacterium.iml" filepath="$PROJECT_DIR$/.idea/proteogenomics-mycobacterium.iml" />
     </modules>
   </component>

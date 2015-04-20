@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(
-    name='BPSYS',
+    name='proteogenomics-mycobacterium',
     version='',
     packages=[],
     url='',

@@ -199,7 +199,7 @@ def choose_prob(error_prob_pairs):
     return error_prob_pairs[int(input(">>> ")) - 1][1]
 
 
-def main(ms_run_code, prot_prophet_xml, protein_db_name):
+def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_name):
     """
 
     :param prot_prophet_xml:

@@ -70,7 +70,7 @@ def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
     xinteract_out = xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
 
     ## Find MetAp activity ##
-    metap_motif_analysis_pipeline.main(ms_run_code, xinteract_out[:-len('pep.xml')] + 'prot.xml', prot_db)
+    metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, xinteract_out[:-len('pep.xml')] + 'prot.xml', prot_db)
 
 
 if __name__ == '__main__':
@@ -83,6 +83,6 @@ if __name__ == '__main__':
     else:
         main(None,
              '../' + 'GitHub_test_files/Mt_proteome.fasta',
-             get_mzxmls('../' + 'GitHub_test_files/'),
+             get_mzxmls('C:/Users/Jeroen/IdeaProjects/proteogenomics-mycobacterium/Local_test_files/'),
              False,
              5)
