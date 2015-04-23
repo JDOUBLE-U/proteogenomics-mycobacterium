@@ -1,4 +1,5 @@
 import itertools
+import os
 import re
 
 from Bio import SeqIO
@@ -18,6 +19,11 @@ def cleave_m(sequence):
 
 
 def cleave_m_only(prot_db_name_in):
+
+    if not os.path.exists('../Comet_analysis_pipeline/preprocessed_db_out/'):
+        os.mkdir('../Comet_analysis_pipeline/preprocessed_db_out/')
+
+
     print("Cleaving the M's of the protein database")
 
     # Parse the db instead of indexing it, because this is faster and we are going to append linearly anyway

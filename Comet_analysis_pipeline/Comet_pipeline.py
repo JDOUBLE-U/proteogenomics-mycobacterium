@@ -46,7 +46,7 @@ def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
         xinteract_executable = 'cd ../xinteract& xinteract.exe'
     else:
         sixpack_executable = './EMBOSS_sixpack_65/linux_sixpack'
-        comet_executable = './Comet_executables/comet.2015011.linux.exe'
+        comet_executable = '../Comet_20151/comet.2015011.linux.exe'
         xinteract_executable = 'xxx'
 
     ## Clear previous results
@@ -62,16 +62,16 @@ def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
     for mzxml in mzxmls:
         comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml))
 
-    ## Get ms run code
-    first_xml = comet_pep_xmls[0]
-    ms_run_code = first_xml[first_xml.rfind('/') + 1:first_xml.rfind(',')].upper()
-
-    ## xinteract ##
-    xinteract_out = xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
-
-    ## Find MetAp activity ##
-    metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, xinteract_out[:-len('pep.xml')] + 'prot.xml', prot_db)
-
+    # ## Get ms run code
+    # first_xml = comet_pep_xmls[0]
+    # ms_run_code = first_xml[first_xml.rfind('/') + 1:first_xml.rfind(',')].upper()
+    #
+    # ## xinteract ##
+    # xinteract_out = xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
+    #
+    # ## Find MetAp activity ##
+    # metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, xinteract_out[:-len('pep.xml')] + 'prot.xml', prot_db)
+    #
 
 if __name__ == '__main__':
     if analyse_on_sixframe():
@@ -83,6 +83,6 @@ if __name__ == '__main__':
     else:
         main(None,
              '../' + 'GitHub_test_files/Mt_proteome.fasta',
-             get_mzxmls('C:/Users/Jeroen/IdeaProjects/proteogenomics-mycobacterium/Local_test_files/'),
+             get_mzxmls('../' + 'GitHub_test_files/'),
              False,
              5)
