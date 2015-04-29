@@ -23,7 +23,12 @@ def clear_previous_results():
 def analyse_on_sixframe():
     # TODO make elephant-proof
     print('Search on six-frame?')
-    if input('>>> ').lower() == 'y':
+    invoer = input(">>> ")
+    if invoer.lower() == 'q':
+        sys.exit("Tot ziens")
+    elif invoer.lower().startswith("y") == False and invoer.lower().startswith("n") == False:
+        print("Antwoord alstublieft allen met de tekens y of n")
+    elif invoer.lower().startswith("y"):
         return True
     else:
         return False
