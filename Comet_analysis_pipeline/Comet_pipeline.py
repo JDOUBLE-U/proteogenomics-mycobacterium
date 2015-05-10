@@ -43,6 +43,12 @@ def get_mzxmls(mzxml_folder):
     return mzxml_names
 
 
+def create_out_folder(out_folder):
+    if not os.path.exists(out_folder):
+        os.mkdir(out_folder)
+    return out_folder
+
+
 def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
     on_os = sys.platform
     if on_os == 'win32':
@@ -53,6 +59,12 @@ def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
         sixpack_executable = './EMBOSS_sixpack_65/linux_sixpack'
         comet_executable = '../Comet_20151/comet.2015011.linux.exe'
         xinteract_executable = 'xxx'
+
+    # Create all out folders
+    create_out_folder("comet_out/")
+    create_out_folder("xinteract_out/")
+    create_out_folder("parsing_out/")
+    create_out_folder('weblogo_out/')
 
     ## Clear previous results
     clear_previous_results()
@@ -67,16 +79,16 @@ def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
     for mzxml in mzxmls:
         comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml))
 
-    # ## Get ms run code
-    # first_xml = comet_pep_xmls[0]
-    # ms_run_code = first_xml[first_xml.rfind('/') + 1:first_xml.rfind(',')].upper()
-    #
-    # ## xinteract ##
-    # xinteract_out = xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
-    #
-    # ## Find MetAp activity ##
-    # metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, xinteract_out[:-len('pep.xml')] + 'prot.xml', prot_db)
-    #
+    ## Get ms run code
+    first_xml = comet_pep_xmls[0]
+    ms_run_code = first_xml[first_xml.rfind('/') + 1:first_xml.rfind(',')].upper()
+
+    ## xinteract ##
+    xinteract_out = xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
+
+    ## Find MetAp activity ##
+    metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, xinteract_out[:-len('pep.xml')] + 'prot.xml', prot_db)
+
 
 if __name__ == '__main__':
     if analyse_on_sixframe():
