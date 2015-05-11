@@ -209,7 +209,7 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_name):
     protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("/"):prot_prophet_xml.rfind(".")]
 
     protein_db = SeqIO.index(protein_db_name, format='fasta')
-    parse_results_folder = create_out_folder("parsing_out/")
+    parse_results_folder = create_out_folder("protxml_parsing_out/")
     weblogos_output_folder = create_out_folder('weblogo_out/')
     readable_out_file = parse_results_folder + protxml_name + ms_run_code + '_sorted_prots.txt'
     readable_metap_act_out_file = parse_results_folder + protxml_name + ms_run_code + '_human_readable.txt'
@@ -222,7 +222,7 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_name):
     weblogo_generator = WebLogoGenerator(weblogos_output_folder)
 
     # Write all hits with a given minimum, for transparency sake
-    save_readable_prot_infos_min_prob(chosen_prob, prots, protein_db, readable_out_file)
+    # save_readable_prot_infos_min_prob(chosen_prob, prots, protein_db, readable_out_file)
 
     # Fasta output, for WebLogo
     find_metap_activity(min_prob=chosen_prob, cleavage_loc=1,

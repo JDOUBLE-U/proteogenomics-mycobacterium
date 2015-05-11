@@ -136,9 +136,9 @@ class Protein():
         element_name = 'peptide'
         if prot_child.tag[-len(element_name):] == element_name and float(prot_child.attrib["initial_probability"]) > 0:
 
-            # To avoid duplicate peptides detected on different charges
-            if prot_child.attrib["peptide_sequence"] not in [peptide.get_seq() for peptide in peptides]:
-                return True
+            # # To avoid duplicate peptides detected on different charges
+            # if prot_child.attrib["peptide_sequence"] not in [peptide.get_seq() for peptide in peptides]:
+            return True
 
     def set_peptides(self, prot):
         peptides = []

@@ -4,6 +4,7 @@ import os
 from Comet_analysis_pipeline import preprocess_db
 from Comet_20151 import run_comet as comet
 from Comet_analysis_pipeline import metap_motif_analysis_pipeline
+from msconvert import run_msconvert as msconvert
 from xinteract import run_xinteract as xinteact
 from EMBOSS_sixpack_65 import run_sixpack as sixpack
 
@@ -12,22 +13,21 @@ __author__ = 'Jeroen'
 
 
 def clear_previous_results():
-    out_folder = [out_folder for out_folder in os.listdir('../' + 'Comet_analysis_pipeline')
-                  if out_folder.endswith('_out')]
-    for out_folder in out_folder:
+    out_folders = [out_folder for out_folder in os.listdir('../' + 'Comet_analysis_pipeline')
+                   if out_folder.endswith('_out')]
+    for out_folder in out_folders:
         files = os.listdir(out_folder)
         for file_name in files:
             os.remove(out_folder + '/' + file_name)
 
 
 def analyse_on_sixframe():
-    # TODO make elephant-proof
-    print('Search on six-frame?')
+    print('Analyse on the six-frame translation of the genome? [y/n]')
     invoer = input(">>> ")
     if invoer.lower() == 'q':
         sys.exit("Tot ziens")
-    elif invoer.lower().startswith("y") == False and invoer.lower().startswith("n") == False:
-        print("Antwoord alstublieft allen met de tekens y of n")
+    elif not invoer.lower().startswith("y") and not invoer.lower().startswith("n"):
+        print("The question can only be answered with y or n")
     elif invoer.lower().startswith("y"):
         return True
     else:
@@ -35,12 +35,12 @@ def analyse_on_sixframe():
 
 
 def get_mzxmls(mzxml_folder):
-    mzxml_names = []
+    mzxml_file_names = []
     for fileName in os.listdir(mzxml_folder):
-        if fileName.endswith('.mzXML'):
-            mzxml_names.append(mzxml_folder + fileName)
+        if fileName.endswith('.mzXML') or fileName.endswith('.mzML'):
+            mzxml_file_names.append(mzxml_folder + fileName)
 
-    return mzxml_names
+    return mzxml_file_names
 
 
 def create_out_folder(out_folder):
@@ -49,25 +49,33 @@ def create_out_folder(out_folder):
     return out_folder
 
 
-def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
+def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
+    # Windows executables
     on_os = sys.platform
     if on_os == 'win32':
         sixpack_executable = 'cd ../EMBOSS_sixpack_65& windows_sixpack.exe'
         comet_executable = 'cd ../Comet_20151& comet.2015011.win64.exe'
         xinteract_executable = 'cd ../xinteract& xinteract.exe'
+        msconvert_executable = 'cd ../msconvert& msconvert.exe'
+    # Linux and Mac executables
     else:
         sixpack_executable = './EMBOSS_sixpack_65/linux_sixpack'
         comet_executable = '../Comet_20151/comet.2015011.linux.exe'
         xinteract_executable = 'xxx'
+        msconvert_executable = 'xxx'
 
-    # Create all out folders
+    ## Create all output folders ##
     create_out_folder("comet_out/")
+    create_out_folder("sixpack_out/")
     create_out_folder("xinteract_out/")
-    create_out_folder("parsing_out/")
+    create_out_folder("protxml_parsing_out/")
     create_out_folder('weblogo_out/')
 
-    ## Clear previous results
+    ## Clear previous results ##
     clear_previous_results()
+
+    ## Convert any raw files to mzxml files ##
+    msconvert.convert_all_raw_files(msconvert_executable, spectras_folder)
 
     ## SixPack ##
     if on_sixframe:
@@ -76,10 +84,11 @@ def main(genome_db, prot_db, mzxmls, on_sixframe, min_pep_length):
     ## Comet ##
     processed_prot_db = preprocess_db.cleave_m_only(prot_db)
     comet_pep_xmls = []
+    mzxmls = get_mzxmls(spectras_folder)
     for mzxml in mzxmls:
         comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml))
 
-    ## Get ms run code
+    ## Get ms run code ##
     first_xml = comet_pep_xmls[0]
     ms_run_code = first_xml[first_xml.rfind('/') + 1:first_xml.rfind(',')].upper()
 
@@ -94,12 +103,12 @@ if __name__ == '__main__':
     if analyse_on_sixframe():
         main('../' + 'GitHub_test_files/Mt_genome.fasta',
              None,
-             get_mzxmls('../' + 'GitHub_test_files/'),
+             '../' + 'GitHub_test_files/',
              True,
              5)
     else:
         main(None,
              '../' + 'GitHub_test_files/Mt_proteome.fasta',
-             get_mzxmls('../' + 'GitHub_test_files/'),
+             '../' + 'GitHub_test_files/',
              False,
              5)
