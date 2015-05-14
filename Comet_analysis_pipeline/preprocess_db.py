@@ -20,17 +20,13 @@ def cleave_m(sequence):
 
 def cleave_m_only(prot_db_name_in):
 
-    if not os.path.exists('../Comet_analysis_pipeline/preprocessed_db_out/'):
-        os.mkdir('../Comet_analysis_pipeline/preprocessed_db_out/')
-
-
     print("Cleaving the M's of the protein database")
 
     # Parse the db instead of indexing it, because this is faster and we are going to append linearly anyway
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
-    # Remove the .fasta suffix and give the new db a proper name
-    procesed_db = "../" "Comet_analysis_pipeline/preprocessed_db_out" + prot_db_name_in[prot_db_name_in.rfind("/"):-(
+    # Remove the .fasta suffix and give the new db an absolute path and a proper name
+    procesed_db = os.getcwd() + "\\preprocessed_db_out\\" + prot_db_name_in[prot_db_name_in.rfind("/") + 1:-(
         len(".fasta"))] + "_comet_M_cleaved_only.fasta"
 
     with open(procesed_db, "w+") as comet_processed_db_out:

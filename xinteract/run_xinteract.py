@@ -3,17 +3,15 @@ __author__ = 'Jeroen'
 import os
 
 
-def run_xinteract(ms_run_code, pep_proph_exec, pep_xmls, min_pep_length):
+def run_xinteract(ms_run_code, xinteract_exec, pep_xmls, min_pep_length):
     print("Starting xinteract")
 
-    interact_absolute_out_path = os.getcwd() + "\\xinteract_out\\" + ms_run_code + ".pep.xml"
+    interact_absolute_out_path = "..\\Comet_analysis_pipeline\\xinteract_out"
 
-    os.system(pep_proph_exec + " -THREADS=7"
-                               " -OpA"
-                               " -l%i"
-                               " -N%s"
-                               " %s"
-              % (min_pep_length, interact_absolute_out_path, " ".join(pep_xmls)))
+    for nr, pep in enumerate(pep_xmls):
+        pep_xmls[nr] = "..\\comet_out\\" + pep
 
-    # glitch of xinteract, doesnt save in upper-case
-    return interact_absolute_out_path.lower()
+    print("out, ", "cd %s& %s -N%s.interact.pep.xml -p0.05 -l%i -OpA %s -THREADS=7" % (interact_absolute_out_path, "..\\..\\" + xinteract_exec, ms_run_code, min_pep_length, " ".join(pep_xmls)))
+
+    # xinteract exe relative to interact_absolute_out_path
+    os.system("cd %s& %s -N%s.interact.pep.xml -p0.05 -l%i -OpA %s -THREADS=7" % (interact_absolute_out_path, "..\\..\\" + xinteract_exec, ms_run_code, min_pep_length, " ".join(pep_xmls)))
