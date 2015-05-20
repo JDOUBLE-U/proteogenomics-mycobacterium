@@ -12,7 +12,7 @@ from EMBOSS_sixpack_65 import run_sixpack as sixpack
 __author__ = 'Jeroen'
 
 
-def clear_previous_results():
+def delete_previous_results():
     out_folders = [out_folder for out_folder in os.listdir('../' + 'Comet_analysis_pipeline')
                    if out_folder.endswith('_out')]
     for out_folder in out_folders:
@@ -46,7 +46,6 @@ def get_mzxmls(mzxml_folder):
 def create_out_folder(out_folder):
     if not os.path.exists(out_folder):
         os.mkdir(out_folder)
-    return out_folder
 
 
 def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
@@ -73,7 +72,7 @@ def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
     create_out_folder('preprocessed_db_out/')
 
     ## Clear previous results ##
-    clear_previous_results()
+    delete_previous_results()
 
     ## Convert any raw files to mzxml files ##
     msconvert.convert_all_raw_files(msconvert_executable, spectras_folder)
@@ -82,10 +81,14 @@ def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
     if on_sixframe:
         prot_db = sixpack.run_sixpack(genome_db, sixpack_executable, on_os)
 
+    ## Process protein db ##
+    # processed_prot_db = preprocess_db.cleave_m_only(prot_db, min_pep_length)
+    processed_prot_db = preprocess_db.cleave_m_and_digest(prot_db, min_pep_length)
+
     ## Comet ##
-    processed_prot_db = preprocess_db.cleave_m_only(prot_db)
     comet_pep_xmls = []
     mzxmls = get_mzxmls(spectras_folder)
+
     for mzxml in mzxmls:
         comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml))
 
@@ -97,7 +100,7 @@ def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
     xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
 
     ## Find MetAp activity ##
-    metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, "..\\xinteract_out\\" + ms_run_code + '.prot.xml', prot_db)
+    metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, "xinteract_out\\" + ms_run_code + '.interact.prot.xml', prot_db)
 
 
 if __name__ == '__main__':
@@ -106,10 +109,10 @@ if __name__ == '__main__':
              None,
              '../' + 'GitHub_test_files/',
              True,
-             5)
+             7)
     else:
         main(None,
              '../' + 'GitHub_test_files/Mt_proteome.fasta',
              '../' + 'GitHub_test_files/',
              False,
-             5)
+             7)

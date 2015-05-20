@@ -18,30 +18,6 @@ Jeroen Merks
 
 """
 
-
-def pretty_print_alignment(prot_seq, peptides):
-    """
-
-    :param prot_seq:
-    :param peptides:
-    :return:
-    """
-    # TODO fix alligning overlapping peptides
-    sorted_peps = sorted(peptides, key=lambda pep_seq: prot_seq.find(pep_seq))
-
-    first_start_pos = prot_seq.find(sorted_peps[0])
-    alignment = "" + first_start_pos * " "
-    alignment += sorted_peps[0]
-    prev_end = len(alignment)
-
-    for peptide in sorted_peps[1:]:
-        space_gap = prot_seq.find(peptide) - prev_end
-        alignment += (space_gap * " ") + peptide
-        prev_end = len(alignment)
-
-    return prot_seq, alignment
-
-
 def get_prots_min(min_prob, prot_groups):
     matching_prots = []
 
@@ -58,8 +34,13 @@ def write_human_readable_results(file, prot, protein_db):
     file.write('Protein ID: %s\n' % prot.get_prot_name())
     file.write('Protein description: %s\n' % prot.get_descr())
     file.write('Probability: %f\n' % prot.get_prob())
-    file.write("%s\n%s\n" % (
-        pretty_print_alignment(prot.get_seq(protein_db), [pep.get_seq() for pep in prot.get_peptides()])))
+    file.write('%s\n' % prot.get_seq(protein_db))
+    for pep in prot.get_peptides():
+        file.write('%s\n' % pep.get_seq())
+
+    # file.write("%s\n%s\n" % (
+    #     pretty_print_alignment(prot.get_seq(protein_db), [pep.get_seq() for pep in prot.get_peptides()])))
+
     file.write('\n')
 
 
@@ -105,9 +86,9 @@ def sort_hits(min_prob, prot_groups):
     return matching_prots, sorten_matching_hits
 
 
-def save_results(write_to_fasta, motif_range_end, motif_range_start,
+def save_results(write_weblogo_in, motif_range_end, motif_range_start,
                  prot, protein_db, out_file):
-    if write_to_fasta:
+    if write_weblogo_in:
         # Write a multiple fasta file with proteis within the given motif range
         prot_seq = SeqRecord(
             Seq(prot.get_seq(protein_db)[motif_range_start:motif_range_end], generic_protein),
@@ -119,11 +100,11 @@ def save_results(write_to_fasta, motif_range_end, motif_range_start,
         write_human_readable_results(out_file, prot, protein_db)
 
 
-def create_append_out_file(fasta_out, readable_out, write_to_fasta):
+def create_append_out_file(weblogo_out, readable_out, write_to_fasta):
     if write_to_fasta:
-        if os.path.exists(fasta_out):
-            os.remove(fasta_out)
-        out_file = open(fasta_out, "a+")
+        if os.path.exists(weblogo_out):
+            os.remove(weblogo_out)
+        out_file = open(weblogo_out, "a+")
     else:
         if os.path.exists(readable_out):
             os.remove(readable_out)
@@ -140,15 +121,15 @@ def create_out_folder(out_folder):
 
 def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
                         motif_range_end, readable_out, prot_groups,
-                        protein_db, fasta_out, write_to_fasta):
+                        protein_db, weblogo_out, write_for_weblogo):
     """
 
     :param min_prob:
     :param cleavage_loc:
     :param motif_range_start:
     :param motif_range_end:
-    :param write_to_fasta:
-    :param fasta_out:
+    :param write_for_weblogo:
+    :param weblogo_out:
     :param readable_out:
     :param prot_groups:
     :param protein_db:
@@ -164,15 +145,17 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
 
     if len(matching_prot_hits) > 0:
 
-        out_file = create_append_out_file(fasta_out, readable_out, write_to_fasta)
+        out_file = create_append_out_file(weblogo_out, readable_out, write_for_weblogo)
 
         for prot in matching_prot_hits:
             for pep in prot.get_peptides():
 
+                # Locate the position of the peptide on the protein
                 pep_pos = prot.get_seq(protein_db).find(pep.get_seq())
+
                 if pep_pos == cleavage_loc:
                     found_metap_activity = True
-                    save_results(write_to_fasta, motif_range_end,
+                    save_results(write_for_weblogo, motif_range_end,
                                  motif_range_start, prot, protein_db,
                                  out_file)
 
@@ -211,9 +194,8 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_name):
     protein_db = SeqIO.index(protein_db_name, format='fasta')
     parse_results_folder = create_out_folder("protxml_parsing_out/")
     weblogos_output_folder = create_out_folder('weblogo_out/')
-    readable_out_file = parse_results_folder + protxml_name + ms_run_code + '_sorted_prots.txt'
     readable_metap_act_out_file = parse_results_folder + protxml_name + ms_run_code + '_human_readable.txt'
-    metap_act_out_fasta_file = parse_results_folder + protxml_name + ms_run_code + '.fasta'
+    metap_act_weblogo_in = parse_results_folder + protxml_name + ms_run_code + '_weblogo_in.fasta'
 
     prot_xml_parser = ProtProphXMLParser(parse_results_folder, prot_prophet_xml)
     statistics = prot_xml_parser.get_error_prob_pairs()
@@ -229,14 +211,14 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_name):
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,
                         prot_groups=prots, protein_db=protein_db,
-                        fasta_out=metap_act_out_fasta_file,
-                        write_to_fasta=True)
+                        weblogo_out=metap_act_weblogo_in,
+                        write_for_weblogo=True)
     # Human readable output
     find_metap_activity(min_prob=chosen_prob, cleavage_loc=1,
                         motif_range_start=1, motif_range_end=6,
                         readable_out=readable_metap_act_out_file,
                         prot_groups=prots, protein_db=protein_db,
-                        fasta_out=metap_act_out_fasta_file,
-                        write_to_fasta=False)
+                        weblogo_out=metap_act_weblogo_in,
+                        write_for_weblogo=False)
 
-    weblogo_generator.create_weblogo(metap_act_out_fasta_file)
+    weblogo_generator.create_weblogo(metap_act_weblogo_in)

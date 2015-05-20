@@ -6,13 +6,10 @@ from lxml import objectify
 
 """
 Jeroen Merks
-Instructions:
-- Install lxml 3.4.2: https://pypi.python.org/pypi/lxml/
-...
 """
 
 
-class ProtProphXMLParser():
+class ProtProphXMLParser:
     """
     :param parse_results_folder:
     :param prot_prophet_xml:
@@ -70,7 +67,7 @@ class ProtProphXMLParser():
         return error_prob_pairs
 
 
-class ProteinGroup():
+class ProteinGroup:
     """
  
     :param prot_group:
@@ -102,7 +99,7 @@ class ProteinGroup():
         return self.prots
 
 
-class Protein():
+class Protein:
     def __init__(self, prot):
         self.prot_name = prot.attrib["protein_name"]
         self.desc = prot.annotation.attrib["protein_description"]
@@ -174,7 +171,7 @@ class Protein():
         return self.peptides
 
 
-class Peptide():
+class Peptide:
     """
  
     :param peptide:
