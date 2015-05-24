@@ -3,11 +3,10 @@ import os
 
 from Comet_analysis_pipeline import preprocess_db
 from Comet_20151 import run_comet as comet
-from Comet_analysis_pipeline import metap_motif_analysis_pipeline
+from Comet_analysis_pipeline import find_metap_activity
 from msconvert import run_msconvert as msconvert
 from xinteract import run_xinteract as xinteact
 from EMBOSS_sixpack_65 import run_sixpack as sixpack
-
 
 __author__ = 'Jeroen'
 
@@ -19,19 +18,6 @@ def delete_previous_results():
         files = os.listdir(out_folder)
         for file_name in files:
             os.remove(out_folder + '/' + file_name)
-
-
-def analyse_on_sixframe():
-    print('Analyse on the six-frame translation of the genome? [y/n]')
-    invoer = input(">>> ")
-    if invoer.lower() == 'q':
-        sys.exit("Tot ziens")
-    elif not invoer.lower().startswith("y") and not invoer.lower().startswith("n"):
-        print("The question can only be answered with y or n")
-    elif invoer.lower().startswith("y"):
-        return True
-    else:
-        return False
 
 
 def get_mzxmls(mzxml_folder):
@@ -48,7 +34,8 @@ def create_out_folder(out_folder):
         os.mkdir(out_folder)
 
 
-def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
+def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, spectras_folder, prot_db_path, genome_db_path,
+         min_pep_length, min_prob, cleavage_loc, motif_range_start, motif_range_end, nr_threads):
     # Windows executables
     on_os = sys.platform
     if on_os == 'win32':
@@ -72,47 +59,38 @@ def main(genome_db, prot_db, spectras_folder, on_sixframe, min_pep_length):
     create_out_folder('preprocessed_db_out/')
 
     ## Clear previous results ##
-    delete_previous_results()
+    if clear_prev_results:
+        delete_previous_results()
 
     ## Convert any raw files to mzxml files ##
     msconvert.convert_all_raw_files(msconvert_executable, spectras_folder)
 
     ## SixPack ##
     if on_sixframe:
-        prot_db = sixpack.run_sixpack(genome_db, sixpack_executable, on_os)
+        prot_db_path = sixpack.run_sixpack(genome_db_path, sixpack_executable, on_os, min_pep_length + 1, codon_table)
 
     ## Process protein db ##
-    # processed_prot_db = preprocess_db.cleave_m_only(prot_db, min_pep_length)
-    processed_prot_db = preprocess_db.cleave_m_and_digest(prot_db, min_pep_length)
+    if on_digest:
+        processed_prot_db = preprocess_db.cleave_m_and_digest(prot_db_path, min_pep_length)
+    else:
+        processed_prot_db = preprocess_db.cleave_m_only(prot_db_path, min_pep_length)
 
     ## Comet ##
     comet_pep_xmls = []
     mzxmls = get_mzxmls(spectras_folder)
-
     for mzxml in mzxmls:
         comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml))
 
-    ## Get ms run code ##
-    first_xml = comet_pep_xmls[0]
-    ms_run_code = first_xml[:-len(".pep.xml")]
-
     ## xinteract ##
-    xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length)
+    xinteact.run_xinteract(ms_run_code, xinteract_executable, comet_pep_xmls, min_pep_length, nr_threads)
 
     ## Find MetAp activity ##
-    metap_motif_analysis_pipeline.run_metap_pipeline(ms_run_code, "xinteract_out\\" + ms_run_code + '.interact.prot.xml', prot_db)
+    find_metap_activity.run_metap_pipeline(ms_run_code,
+                                                     "xinteract_out\\" + ms_run_code + '.interact.prot.xml',
+                                                     prot_db_path, min_prob, cleavage_loc, motif_range_start,
+                                                     motif_range_end)
 
 
 if __name__ == '__main__':
-    if analyse_on_sixframe():
-        main('../' + 'GitHub_test_files/Mt_genome.fasta',
-             None,
-             '../' + 'GitHub_test_files/',
-             True,
-             7)
-    else:
-        main(None,
-             '../' + 'GitHub_test_files/Mt_proteome.fasta',
-             '../' + 'GitHub_test_files/',
-             False,
-             7)
+    main(True, "Mt_spectra", False, 11, True, '../' + 'GitHub_test_files/', '../' + 'GitHub_test_files/Mt_proteome.fasta',
+         '../' + 'GitHub_test_files/Mt_genome.fasta', 7, float(0.95),  1, 0, 5, 7)

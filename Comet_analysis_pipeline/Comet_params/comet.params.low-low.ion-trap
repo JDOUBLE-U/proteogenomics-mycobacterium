@@ -5,8 +5,6 @@
 database_name = /some/path/db.fasta
 decoy_search = 0                       # 0=no (default), 1=concatenated search, 2=separate search
 
-num_threads = 7                        # 0=poll CPU to set num threads; else specify num threads directly (max 64)
-
 #
 # masses
 #
@@ -158,3 +156,4 @@ add_Z_user_amino_acid = 0.0000         # added to Z - avg.   0.0000, mono.   0.0
 9.  PepsinA                1      FL          P
 10. Chymotrypsin           1      FWYL        P
 
+num_threads = 0

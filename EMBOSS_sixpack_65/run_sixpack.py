@@ -14,31 +14,13 @@ import os
  Any ORFs that are longer than the specified minimum size are written to the output sequence file.
 """
 
-CODON_TABLE = 11  # Bacterial codon table (by NCBI standards)
 
-
-def choose_min_prot_length():
-    print("What is the minimum protein length allowed?"
-          "Keep in mind the n-terminus may be cleaved after this step.")
-    return int(input(">>> "))
-
-
-# TODO add option for mandatory M on n-terminus
-def choose_mandatory_M():
-    print("Make start codons code for Methionine by default? [y/n]")
-    if input(">>> ").lower() == "y":
-        return " -mstart"
-    else:
-        return ""
-
-
-def run_sixpack(genome_file, executable, on_platform):
+def run_sixpack(genome_file, executable, on_platform, min_prot_length, codon_table):
     print("Running EMBOSS Sixpack")
 
     fasta_out = "../" + "Comet_analysis_pipeline/sixpack_out" + genome_file[genome_file.rfind("/"):-len(
         ".fasta")] + "_six_frame.fasta"
     # visual_out = fasta_out[:-len(".fasta")] + ".txt"
-    min_prot_len = choose_min_prot_length()
 
     # TODO perhaps add the "features format -fformat1" parameter for custom fasta descriptors?
     os.system(executable + " -sequence %s"
@@ -64,6 +46,6 @@ def run_sixpack(genome_file, executable, on_platform):
                            " -auto"
                            " -verbose"
                            " -mstart"  # Make optional?
-              % (genome_file, CODON_TABLE, fasta_out, on_platform, min_prot_len))
+              % (genome_file, codon_table, fasta_out, on_platform, min_prot_length))
 
     return fasta_out

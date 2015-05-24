@@ -7,7 +7,7 @@ import radon.metrics as mi
 
 sort_attrib = "LINES"
 
-script_loc = "../" + "Comet/metap_motif_analysis_pipeline.py"
+script_loc = "../" + "Comet/find_metap_activity.py"
 script_name = script_loc[script_loc.rfind("/") + 1:]
 
 raw_code = open(script_loc).read()
