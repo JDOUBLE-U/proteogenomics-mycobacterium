@@ -1,4 +1,4 @@
-# comet_version 2015.01 rev. 0
+# comet_version 2015.01 rev. 1
 # Comet MS/MS search engine parameters file.
 # Everything following the '#' symbol is treated as a comment.
 
@@ -91,7 +91,7 @@ max_fragment_charge = 3                # set maximum fragment charge state to an
 max_precursor_charge = 6               # set maximum precursor charge state to analyze (allowed max 9)
 nucleotide_reading_frame = 0           # 0=proteinDB, 1-6, 7=forward three, 8=reverse three, 9=all six
 clip_nterm_methionine = 0              # 0=leave sequences as-is; 1=also consider sequence w/o N-term methionine
-spectrum_batch_size = 1000                # max. # of spectra to search at a time; 0 to search the entire scan range in one loop
+spectrum_batch_size = 2000             # max. # of spectra to search at a time; 0 to search the entire scan range in one loop
 decoy_prefix = DECOY_                  # decoy entries are denoted by this string which is pre-pended to each protein accession
 output_suffix =                        # add a suffix to output base names i.e. suffix "-C" generates base-C.pep.xml from base.mzXML input
 
@@ -156,4 +156,4 @@ add_Z_user_amino_acid = 0.0000         # added to Z - avg.   0.0000, mono.   0.0
 9.  PepsinA                1      FL          P
 10. Chymotrypsin           1      FWYL        P
 
-num_threads = 0
+num_threads = 8

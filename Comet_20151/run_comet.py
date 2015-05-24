@@ -4,12 +4,12 @@ import os
 
 
 def run_comet(comet_exec, prot_db, mzxml):
-    # params_file = "../" + "Comet_analysis_pipeline/Comet_params/comet.params.high-low.velos-orbitrap"
-    params_file = "../" + "Comet_analysis_pipeline/Comet_params/comet.params.low-low.ion-trap"
+    # params_file = "..\\" + "analysis_pipeline\\Comet_params\\comet.params.high-low.velos-orbitrap"
+    params_file = "..\\" + "analysis_pipeline\\Comet_params\\comet.params.low-low.ion-trap"
 
-    out_name = mzxml[mzxml.rfind("/") + 1:-len(".mzXML")]
+    out_name = mzxml[mzxml.rfind("\\") + 1:-len(".mzXML")]
 
-    out_file = "../" + "Comet_analysis_pipeline/comet_out/" + out_name
+    out_file = "..\\" + "analysis_pipeline/comet_out\\" + out_name
 
     os.system(comet_exec + " %s"
                            " -P%s"

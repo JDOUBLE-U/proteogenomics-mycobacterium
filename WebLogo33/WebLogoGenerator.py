@@ -53,7 +53,7 @@ class WebLogoGenerator():
         byte_array = png_formatter(raw_data, weblogo_format)
         motif_png = open(
             self.output_folder + target_proteins[
-                                 target_proteins.rfind("/"):target_proteins.rfind(".")] + "_weblogo.png",
+                                 target_proteins.rfind("\\"):target_proteins.rfind(".")] + "_weblogo.png",
             'wb+')
         motif_png.write(byte_array)
         motif_png.close()

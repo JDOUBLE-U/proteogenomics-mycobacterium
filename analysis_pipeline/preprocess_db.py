@@ -44,11 +44,13 @@ def cleave_m_only(prot_db_name_in, min_seq_len):
 
 
 def cleave_m_and_digest(prot_db_name_in, min_seq_len):
+    print("Preprocessing the protein database by cleaving the n-terminus and virtually digesting it with tripsin")
+
     # Parse the db instead of indexing it, because this is faster and we are going to append chronologically anyway
     protein_db_in = SeqIO.parse(prot_db_name_in, format='fasta')
 
     # Remove the .fasta suffix and give the new db an absolute path and a proper name
-    procesed_db = os.getcwd() + "\\preprocessed_db_out\\" + prot_db_name_in[prot_db_name_in.rfind("/") + 1:-(
+    procesed_db = os.getcwd() + "\\preprocessed_db_out\\" + prot_db_name_in[prot_db_name_in.rfind("\\") + 1:-(
         len(".fasta"))] + "_comet_digested_and_cleaved.fasta"
 
     # Append the virtually cleaved and trypsin digested proteins into the copied file

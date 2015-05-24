@@ -1,4 +1,4 @@
-# comet_version 2015.01 rev. 0
+# comet_version 2015.01 rev. 1
 # Comet MS/MS search engine parameters file.
 # Everything following the '#' symbol is treated as a comment.
 
@@ -156,4 +156,4 @@ add_Z_user_amino_acid = 0.0000         # added to Z - avg.   0.0000, mono.   0.0
 9.  PepsinA                1      FL          P
 10. Chymotrypsin           1      FWYL        P
 
-num_threads = 0
+num_threads = 8

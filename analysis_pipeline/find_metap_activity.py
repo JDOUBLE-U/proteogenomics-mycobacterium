@@ -98,11 +98,11 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
 def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob, cleavage_loc, motif_range_start,
                        motif_range_end):
 
-    protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("/"):prot_prophet_xml.rfind(".")]
+    protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("\\"):prot_prophet_xml.rfind(".")]
 
     protein_db = SeqIO.index(protein_db_path, format='fasta')
-    parse_results_out_paht = create_out_folder("protxml_parsing_out/")
-    weblogos_out_path = create_out_folder('weblogo_out/')
+    parse_results_out_paht = create_out_folder("protxml_parsing_out\\")
+    weblogos_out_path = create_out_folder('weblogo_out\\')
     readable_out_name = parse_results_out_paht + protxml_name + ms_run_code + '_human_readable.txt'
     weblogo_in_name = parse_results_out_paht + protxml_name + ms_run_code + '_weblogo_in.fasta'
 
@@ -111,7 +111,7 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob,
     prots = [prot for prot in prot_xml_parser.get_prot_groups()]
     weblogo_generator = WebLogoGenerator(weblogos_out_path)
 
-    print("Parsing prot.xml\n")
+    print("Parsing prot.xml")
     find_metap_activity(min_prob, cleavage_loc, motif_range_start,
                         motif_range_end, readable_out_name, prots,
                         protein_db, weblogo_in_name)
