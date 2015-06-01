@@ -2,15 +2,15 @@ from unittest import TestCase
 
 from Bio import SeqIO
 
-from ProteinProphetParser import ProtProphXMLParser
-from ProteinProphetParser.ProtProphXMLParser import ProteinGroup
+from ProteinProphetParser import XinteractParser
+from ProteinProphetParser.XinteractParser import ProteinGroup
 
 # TODO make file references relative
 
 class TestProtXMLParser(TestCase):
     # Check if all protein groups get properly fetched and return correct group numbers and probabilities
     def test_get_prot_groups(self):
-        protxmlparser = ProtProphXMLParser
+        protxmlparser = XinteractParser
         protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
 
         prot_groups = protxmlparser.get_prot_groups(protxmlparser)
@@ -27,7 +27,7 @@ class TestProtXMLParser(TestCase):
     # Check if protein_summary_data_filter gets fetched and the proper false_positive_error rates are getting tied to the
     # proper min_probability rates
     def test_get_statistics_dict(self):
-        protxmlparser = ProtProphXMLParser
+        protxmlparser = XinteractParser
         protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
 
         statistics_dict = protxmlparser.get_error_prob_pairs(protxmlparser)
@@ -39,7 +39,7 @@ class TestProtXMLParser(TestCase):
 class TestProteinGroup(TestCase):
     def test_set_and_get_prot_groups(self):
 
-        protxmlparser = ProtProphXMLParser
+        protxmlparser = XinteractParser
         protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
 
         # Check if nr of proteins in group 0 is correct
@@ -59,7 +59,7 @@ class TestProteinGroup(TestCase):
 
 class TestProtein(TestCase):
     def test_test_get_peptide(self):
-        protxmlparser = ProtProphXMLParser
+        protxmlparser = XinteractParser
         test_prot_db = SeqIO.index("./GitHub_test_files/prot_test_db", format='fasta')
         protxmlparser.prot_prophet_xml = "./GitHub_test_files/prophet_test_xml.xml"
         prot_groups = protxmlparser.get_prot_groups(protxmlparser)

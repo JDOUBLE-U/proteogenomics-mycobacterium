@@ -95,7 +95,7 @@ def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, s
 
 if __name__ == '__main__':
     start_time = timeit.default_timer()
-    main(True, "M_marium_spectra", False, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\", '..\\' + 'GitHub_test_files\\M_marium_proteome.fasta',
+    main(True, "M_marium_spectra", True, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\", '..\\' + 'GitHub_test_files\\M_marium_proteome.fasta',
          '..\\' + 'GitHub_test_files\\M_tuberculosis_genome.fasta', 7, float(0.95),  1, 1, 6, 8)
     stop_time = timeit.default_timer()
     print("The Pipeline took %i seconds to run\n" % stop_time)

@@ -1,12 +1,13 @@
 # !/usr/bin/python
 # coding=utf-8
 import os
+import csv
 
 from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 from Bio import SeqIO
-from ProteinProphetParser.ProtProphXMLParser import ProtProphXMLParser
+from ProteinProphetParser.XinteractParser import XinteractParser
 from WebLogo33.WebLogoGenerator import WebLogoGenerator
 
 """
@@ -53,8 +54,86 @@ def write_readable_result_hit(readable_out_file, prot, protein_db):
     readable_out_file.write('\n')
 
 
-def save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file):
+def write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db):
 
+    for pep in prot.get_peptides:
+        ## "Sequence"
+        # pep.get_seq(protein_db),
+        ## "N-terminal"
+        # "-",
+        ## "C-terminal"
+        # "-",
+        ## "Modifications"
+        # "-",
+        ## "Mass"
+        # pep.get_neutral_mass(),
+        ## "Mass Fractional Part"
+        # "-",
+        ## "Protein Groups"
+        # prot.
+        ## "Proteins"
+        ## "Unique (Groups)"
+        ## "Unique (Proteins)"
+        ## "Acetyl (Protein N-term)"
+        ## "Oxidation (M)"
+        ## "Missed cleavages"
+        ## "Retention time"
+        ## "Calibrated retention time"
+        ## "Charges"
+        ## "PEP"
+        ## "MS/MS scan number"
+        ## "Raw file"
+        ## "Score"
+        ## "Delta score"
+        ## "Intensity"
+        ## "Reverse"
+        ## "Potential contaminant"
+        ## "id"
+        ## "Protein group IDs"
+        ## "Peptide ID"
+        ## "Evidence IDs"
+        ## "MS/MS IDs"
+        ## "Best MS/MS"
+        ## "Oxidation (M) site IDs"
+        ## "MS/MS Count"
+
+        maxquant_csv_writer.writerow(
+            [prot.get_seq(protein_db),
+             "-",
+             "-",
+             "Modifications",
+             "Mass",
+             "Mass Fractional Part",
+             "Protein Groups",
+             "Proteins",
+             "Unique (Groups)",
+             "Unique (Proteins)",
+             "Acetyl (Protein N-term)",
+             "Oxidation (M)",
+             "Missed cleavages",
+             "Retention time",
+             "Calibrated retention time",
+             "Charges",
+             "PEP",
+             "MS/MS scan number",
+             "Raw file",
+             "Score",
+             "Delta score",
+             "Intensity",
+             "Reverse",
+             "Potential contaminant",
+             "id",
+             "Protein group IDs",
+             "Peptide ID",
+             "Evidence IDs",
+             "MS/MS IDs",
+             "Best MS/MS",
+             "Oxidation (M) site IDs",
+             "MS/MS Count"])
+
+
+def save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
+             maxquant_csv_writer):
     # Write a multiple fasta file with proteis within the given motif range
     prot_seq = SeqRecord(
         Seq(prot.get_seq(protein_db)[motif_range_start:motif_range_end], generic_protein),
@@ -62,17 +141,19 @@ def save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_fi
         description=prot.get_descr())
     SeqIO.write(prot_seq, weblogo_in_file, "fasta")
 
+    # Write the hit in a way a human can easily check it
     write_readable_result_hit(readable_out_file, prot, protein_db)
 
+    # Write a hit in the same way MaxQuant outputs it's results
+    write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db)
 
-def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
-                        motif_range_end, readable_out_path, prots,
-                        protein_db, weblogo_in_path):
 
+def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, prots, protein_db, weblogo_in_path,
+                        readable_out_path, maxquant_csv_writer):
     found_metap_activity = False
 
-    weblogo_in_file = open(weblogo_in_path, "a+")
-    readable_out_file = open(readable_out_path, "a+")
+    weblogo_in_file = open(weblogo_in_path, "a")
+    readable_out_file = open(readable_out_path, "a")
 
     matching_prots, matching_prot_hits = sort_hits(min_prob, prots)
 
@@ -86,7 +167,8 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
 
                 if pep_pos == cleavage_loc:
                     found_metap_activity = True
-                    save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file)
+                    save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
+                             maxquant_csv_writer)
 
         if not found_metap_activity:
             print("No metap-activity has been detected!")
@@ -97,7 +179,6 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start,
 
 def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob, cleavage_loc, motif_range_start,
                        motif_range_end):
-
     protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("\\"):prot_prophet_xml.rfind(".")]
 
     protein_db = SeqIO.index(protein_db_path, format='fasta')
@@ -106,14 +187,27 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob,
     readable_out_name = parse_results_out_paht + protxml_name + ms_run_code + '_human_readable.txt'
     weblogo_in_name = parse_results_out_paht + protxml_name + ms_run_code + '_weblogo_in.fasta'
 
-    prot_xml_parser = ProtProphXMLParser(parse_results_out_paht, prot_prophet_xml)
+    maxquant_out_name = parse_results_out_paht + protxml_name + ms_run_code + '_maxquant.csv'
+    maxquant_out_file = open(maxquant_out_name, "wb")
+    maquant_csv_writer = csv.writer(maxquant_out_file, quotechar=',', quoting=csv.QUOTE_MINIMAL)
+
+    # Write the first row of the MaxQuant csv file
+    maquant_csv_writer.writerow(["Sequence", "N-terminal", "C-terminal", "Modifications", "Mass",
+                                 "Mass Fractional Part", "Protein Groups", "Proteins", "Unique (Groups)",
+                                 "Unique (Proteins)",
+                                 "Acetyl (Protein N-term)", "Oxidation (M)", "Missed cleavages", "Retention time",
+                                 "Calibrated retention time", "Charges", "PEP", "MS/MS scan number", "Raw file",
+                                 "Score", "Delta score", "Intensity", "Reverse", "Potential contaminant", "id",
+                                 "Protein group IDs", "Peptide ID", "Evidence IDs", "MS/MS IDs", "Best MS/MS",
+                                 "Oxidation (M) site IDs", "MS/MS Count"])
+
+    prot_xml_parser = XinteractParser(parse_results_out_paht, prot_prophet_xml)
 
     prots = [prot for prot in prot_xml_parser.get_prot_groups()]
     weblogo_generator = WebLogoGenerator(weblogos_out_path)
 
     print("Parsing prot.xml")
-    find_metap_activity(min_prob, cleavage_loc, motif_range_start,
-                        motif_range_end, readable_out_name, prots,
-                        protein_db, weblogo_in_name)
+    find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, prots, protein_db, weblogo_in_name,
+                        readable_out_name, maquant_csv_writer)
 
     weblogo_generator.create_weblogo(weblogo_in_name)

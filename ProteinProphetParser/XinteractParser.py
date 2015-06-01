@@ -9,7 +9,7 @@ Jeroen Merks
 """
 
 
-class ProtProphXMLParser:
+class XinteractParser:
     """
     :param parse_results_folder:
     :param prot_prophet_xml:
@@ -179,6 +179,7 @@ class Peptide:
 
     def __init__(self, peptide):
         self.seq = peptide.attrib["peptide_sequence"]
+        self.neutral_mass = peptide.attrib["calc_neutral_pep_mass"]
         self.charge = peptide.attrib["charge"]
         self.initial_prob = peptide.attrib["initial_probability"]
         self.nsp_prob = peptide.attrib["nsp_adjusted_probability"]
@@ -203,6 +204,9 @@ class Peptide:
                 parent_proteins.append(peptide_child.attrib)
 
         return parent_proteins
+
+    def get_neutral_mass(self):
+        return self.neutral_mass
 
     def get_seq(self):
         return self.seq
