@@ -179,7 +179,7 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
 
 def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob, cleavage_loc, motif_range_start,
                        motif_range_end):
-    protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("\\"):prot_prophet_xml.rfind(".")]
+    protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("\\"):prot_prophet_xml.find(".")]
 
     protein_db = SeqIO.index(protein_db_path, format='fasta')
     parse_results_out_paht = create_out_folder("protxml_parsing_out\\")

@@ -2,6 +2,7 @@ import sys
 import os
 import timeit
 
+from gui import wx_gui
 from analysis_pipeline import preprocess_db
 from Comet_20151 import run_comet as comet
 from analysis_pipeline import find_metap_activity
@@ -35,7 +36,8 @@ def create_out_folder(out_folder):
         os.mkdir(out_folder)
 
 
-def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, spectras_folder, prot_db_path, genome_db_path,
+def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, spectras_folder, prot_db_path,
+         genome_db_path,
          min_pep_length, min_prob, cleavage_loc, motif_range_start, motif_range_end, nr_threads):
     # Windows executables
     on_os = sys.platform
@@ -88,14 +90,17 @@ def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, s
 
     ## Find MetAp activity ##
     find_metap_activity.run_metap_pipeline(ms_run_code,
-                                                     "xinteract_out\\" + ms_run_code + '.interact.prot.xml',
-                                                     prot_db_path, min_prob, cleavage_loc, motif_range_start,
-                                                     motif_range_end)
+                                           "xinteract_out\\" + ms_run_code + '.interact.prot.xml',
+                                           prot_db_path, min_prob, cleavage_loc, motif_range_start,
+                                           motif_range_end)
 
 
 if __name__ == '__main__':
+    wx_gui.run()
+
     start_time = timeit.default_timer()
-    main(True, "M_marium_spectra", True, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\", '..\\' + 'GitHub_test_files\\M_marium_proteome.fasta',
-         '..\\' + 'GitHub_test_files\\M_tuberculosis_genome.fasta', 7, float(0.95),  1, 1, 6, 8)
+    main(True, "M_marium_spectra", True, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\",
+         '..\\' + 'GitHub_test_files\\M_marium_proteome.fasta',
+         '..\\' + 'GitHub_test_files\\M_tuberculosis_genome.fasta', 7, float(0.95), 1, 1, 6, 8)
     stop_time = timeit.default_timer()
     print("The Pipeline took %i seconds to run\n" % stop_time)
