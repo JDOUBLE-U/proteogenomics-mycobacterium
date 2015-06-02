@@ -7,8 +7,8 @@ from Bio.Alphabet import generic_protein
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 from Bio import SeqIO
-from ProteinProphetParser.XinteractParser import XinteractParser
-from WebLogo33.WebLogoGenerator import WebLogoGenerator
+from XinteractParser.XinteractParser import XinteractParser
+from WebLogo34.WebLogoGenerator import WebLogoGenerator
 
 """
 Jeroen Merks
@@ -55,81 +55,82 @@ def write_readable_result_hit(readable_out_file, prot, protein_db):
 
 
 def write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db):
+    pass
 
-    for pep in prot.get_peptides:
-        ## "Sequence"
-        # pep.get_seq(protein_db),
-        ## "N-terminal"
-        # "-",
-        ## "C-terminal"
-        # "-",
-        ## "Modifications"
-        # "-",
-        ## "Mass"
-        # pep.get_neutral_mass(),
-        ## "Mass Fractional Part"
-        # "-",
-        ## "Protein Groups"
-        # prot.
-        ## "Proteins"
-        ## "Unique (Groups)"
-        ## "Unique (Proteins)"
-        ## "Acetyl (Protein N-term)"
-        ## "Oxidation (M)"
-        ## "Missed cleavages"
-        ## "Retention time"
-        ## "Calibrated retention time"
-        ## "Charges"
-        ## "PEP"
-        ## "MS/MS scan number"
-        ## "Raw file"
-        ## "Score"
-        ## "Delta score"
-        ## "Intensity"
-        ## "Reverse"
-        ## "Potential contaminant"
-        ## "id"
-        ## "Protein group IDs"
-        ## "Peptide ID"
-        ## "Evidence IDs"
-        ## "MS/MS IDs"
-        ## "Best MS/MS"
-        ## "Oxidation (M) site IDs"
-        ## "MS/MS Count"
+# for pep in prot.get_peptides:
+## "Sequence"
+# pep.get_seq(protein_db),
+## "N-terminal"
+# "-",
+## "C-terminal"
+# "-",
+## "Modifications"
+# "-",
+## "Mass"
+# pep.get_neutral_mass(),
+## "Mass Fractional Part"
+# "-",
+## "Protein Groups"
+# prot.
+## "Proteins"
+## "Unique (Groups)"
+## "Unique (Proteins)"
+## "Acetyl (Protein N-term)"
+## "Oxidation (M)"
+## "Missed cleavages"
+## "Retention time"
+## "Calibrated retention time"
+## "Charges"
+## "PEP"
+## "MS/MS scan number"
+## "Raw file"
+## "Score"
+## "Delta score"
+## "Intensity"
+## "Reverse"
+## "Potential contaminant"
+## "id"
+## "Protein group IDs"
+## "Peptide ID"
+## "Evidence IDs"
+## "MS/MS IDs"
+## "Best MS/MS"
+## "Oxidation (M) site IDs"
+## "MS/MS Count"
 
-        maxquant_csv_writer.writerow(
-            [prot.get_seq(protein_db),
-             "-",
-             "-",
-             "Modifications",
-             "Mass",
-             "Mass Fractional Part",
-             "Protein Groups",
-             "Proteins",
-             "Unique (Groups)",
-             "Unique (Proteins)",
-             "Acetyl (Protein N-term)",
-             "Oxidation (M)",
-             "Missed cleavages",
-             "Retention time",
-             "Calibrated retention time",
-             "Charges",
-             "PEP",
-             "MS/MS scan number",
-             "Raw file",
-             "Score",
-             "Delta score",
-             "Intensity",
-             "Reverse",
-             "Potential contaminant",
-             "id",
-             "Protein group IDs",
-             "Peptide ID",
-             "Evidence IDs",
-             "MS/MS IDs",
-             "Best MS/MS",
-             "Oxidation (M) site IDs",
-             "MS/MS Count"])
+# maxquant_csv_writer.writerow(
+#     [prot.get_seq(protein_db),
+#      "-",
+#      "-",
+#      "Modifications",
+#      "Mass",
+#      "Mass Fractional Part",
+#      "Protein Groups",
+#      "Proteins",
+#      "Unique (Groups)",
+#      "Unique (Proteins)",
+#      "Acetyl (Protein N-term)",
+#      "Oxidation (M)",
+#      "Missed cleavages",
+#      "Retention time",
+#      "Calibrated retention time",
+#      "Charges",
+#      "PEP",
+#      "MS/MS scan number",
+#      "Raw file",
+#      "Score",
+#      "Delta score",
+#      "Intensity",
+#      "Reverse",
+#      "Potential contaminant",
+#      "id",
+#      "Protein group IDs",
+#      "Peptide ID",
+#      "Evidence IDs",
+#      "MS/MS IDs",
+#      "Best MS/MS",
+#      "Oxidation (M) site IDs",
+#      "MS/MS Count"])
 
 
 def save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
@@ -192,14 +193,14 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob,
     maquant_csv_writer = csv.writer(maxquant_out_file, quotechar=',', quoting=csv.QUOTE_MINIMAL)
 
     # Write the first row of the MaxQuant csv file
-    maquant_csv_writer.writerow(["Sequence", "N-terminal", "C-terminal", "Modifications", "Mass",
-                                 "Mass Fractional Part", "Protein Groups", "Proteins", "Unique (Groups)",
-                                 "Unique (Proteins)",
-                                 "Acetyl (Protein N-term)", "Oxidation (M)", "Missed cleavages", "Retention time",
-                                 "Calibrated retention time", "Charges", "PEP", "MS/MS scan number", "Raw file",
-                                 "Score", "Delta score", "Intensity", "Reverse", "Potential contaminant", "id",
-                                 "Protein group IDs", "Peptide ID", "Evidence IDs", "MS/MS IDs", "Best MS/MS",
-                                 "Oxidation (M) site IDs", "MS/MS Count"])
+    # maquant_csv_writer.writerow(["Sequence", "N-terminal", "C-terminal", "Modifications", "Mass",
+    #                              "Mass Fractional Part", "Protein Groups", "Proteins", "Unique (Groups)",
+    #                              "Unique (Proteins)",
+    #                              "Acetyl (Protein N-term)", "Oxidation (M)", "Missed cleavages", "Retention time",
+    #                              "Calibrated retention time", "Charges", "PEP", "MS/MS scan number", "Raw file",
+    #                              "Score", "Delta score", "Intensity", "Reverse", "Potential contaminant", "id",
+    #                              "Protein group IDs", "Peptide ID", "Evidence IDs", "MS/MS IDs", "Best MS/MS",
+    #                              "Oxidation (M) site IDs", "MS/MS Count"])
 
     prot_xml_parser = XinteractParser(parse_results_out_paht, prot_prophet_xml)
 

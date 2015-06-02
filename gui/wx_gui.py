@@ -1,10 +1,12 @@
 # import modules
+import sys
+
 import wx
 
 
 class CodonDialog(wx.Dialog):
     def __init__(self, parent, id, title, label, codondict):
-        wx.Dialog.__init__(self, parent, id, title, size=(500, 450))
+        wx.Dialog.__init__(self, parent, id, title, size=(500, 500))
         box = wx.BoxSizer()
         grid = wx.GridSizer(16, 8, 0, 0)
         for key in sorted(codondict.keys()):
@@ -25,20 +27,21 @@ class CodonDialog(wx.Dialog):
 class ProgPanel(wx.Panel):
     def __init__(self, parent, id):
         wx.Panel.__init__(self, parent, id, style=wx.BORDER_SIMPLE)
-        self.font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+        self.font = wx.Font(13, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         self.SetFont(self.font)
         self.mainbox = wx.BoxSizer()
         self.progtext = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY | wx.TE_MULTILINE)
         #        self.progresstext.SetBackgroundColour("BLACK")
         #        self.progresstext.SetForegroundColour("WHITE")
         self.mainbox.Add(self.progtext, 1, wx.EXPAND)
+        sys.stdout = self.progtext
         self.SetSizer(self.mainbox)
 
 
 class InputPanel(wx.Panel):
     def __init__(self, parent, id):
         wx.Panel.__init__(self, parent, id)
-        self.font = wx.Font(11, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+        self.font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
         self.SetFont(self.font)
         #### Create UI elements
         ##create sizers
@@ -75,6 +78,7 @@ class InputPanel(wx.Panel):
         self.vbox.Add(wx.StaticText(self, -1, "Use six-frame translation?"))
         self.radio_no = wx.RadioButton(self, -1, "No", style=wx.RB_GROUP)
         self.radio_yes = wx.RadioButton(self, -1, "Yes")
+        self.sixchoice = 0
         self.sixbox = wx.BoxSizer()
         self.sixbox.Add(self.radio_no, 0, wx.EXPAND)
         self.sixbox.Add(wx.StaticText(self, -1, "    "), 0, wx.EXPAND)
@@ -145,15 +149,24 @@ class InputPanel(wx.Panel):
         self.peplenspin.Bind(wx.EVT_SPINCTRL, self.onPepLenSpin)
         self.vbox.AddSpacer(5)
 
+        ## cleavage location
+        self.vbox.Add(wx.StaticText(self, -1, "Cleavage location"))
+        self.cleavespin = wx.SpinCtrl(self, -1, "1", min=1, max=self.peplenspin.GetValue() - 1)
+        self.vbox.Add(self.cleavespin, 0, wx.SHAPED)
+        self.vbox.AddSpacer(5)
+
         ## Digest before starting
         self.vbox.Add(wx.StaticText(self, -1, "Digest before starting?"))
         self.digradio_n = wx.RadioButton(self, -1, "No", style=wx.RB_GROUP)
         self.digradio_y = wx.RadioButton(self, -1, "Yes")
+        self.digestchoice = 0
         self.digestbox = wx.BoxSizer()
         self.digestbox.Add(self.digradio_n, 0, wx.EXPAND)
         self.digestbox.Add(wx.StaticText(self, -1, "    "), 0)
         self.digestbox.Add(self.digradio_y, 0, wx.EXPAND)
         self.vbox.Add(self.digestbox, 0, wx.EXPAND | wx.ALL, 1)
+        self.digradio_n.Bind(wx.EVT_RADIOBUTTON, self.onDigestRadio)
+        self.digradio_y.Bind(wx.EVT_RADIOBUTTON, self.onDigestRadio)
         self.vbox.AddSpacer(5)
 
         ## Number of threads
@@ -175,15 +188,18 @@ class InputPanel(wx.Panel):
 
     def onPepLenSpin(self, event):
         self.wlspin.SetRange(1, self.peplenspin.GetValue())
+        self.cleavespin.SetRange(1, self.peplenspin.GetValue() - 1)
 
     def onSixRadio(self, event):
         if event.GetEventObject().GetLabel() == "Yes":
+            self.sixchoice = 1
             self.vbox.Show(self.genofol)
             self.vbox.Show(self.genotext)
             self.vbox.Show(self.codontext)
             self.vbox.Show(self.codonmenu)
             self.vbox.Show(self.viewbutton)
         else:
+            self.sixchoice = 0
             self.vbox.Hide(self.genofol)
             self.vbox.Hide(self.genotext)
             self.vbox.Hide(self.codontext)
@@ -199,13 +215,19 @@ class InputPanel(wx.Panel):
             self.max_error = 0.01
         else:
             self.max_error = 0.05
-        print(self.max_error)
+
+    def onDigestRadio(self, event):
+        if event.GetEventObject().GetLabel() == "Yes":
+            self.digestchoice = 1
+        else:
+            self.digestchoice = 0
+        print(event.GetEventObject().GetLabel())
 
     def onStart(self, event):
-        # check all inputs when start is pressed
         self.checkInputs()
 
     def checkInputs(self):
+
         if self.namectrl.GetValue().isalnum():
             print("ja")
         else:
@@ -225,10 +247,51 @@ class InputPanel(wx.Panel):
                         self.codondict[pair[0]] = pair[1]
                 linenum += 1
 
+    def get_spectra_folder(self):
+        return self.specfol.GetPath()
+
+    def get_output_folder(self):
+        return self.outfol.GetPath()
+
+    def get_output_name(self):
+        return self.namectrl.GetValue()
+
+    def get_proteome_folder(self):
+        return self.protfol.GetPath()
+
+    def get_sixframe_choice(self):
+        return self.sixchoice
+
+    def get_genome_folder(self):
+        if self.sixchoice == 1:
+            return self.genofol.GetPath()
+
+    def get_codon_table(self):
+        if self.sixchoice == 1:
+            return self.codonmenu.GetSelection()
+
+    def get_motif_range(self):
+        return [1, self.wlspin.GetValue()]
+
+    def get_max_error(self):
+        return self.max_error
+
+    def get_min_pep_pength(self):
+        return self.peplenspin.GetValue()
+
+    def get_cleavage_location(self):
+        return self.cleavespin.GetValue()
+
+    def get_digest_choice(self):
+        return self.digestchoice
+
+    def get_nr_threads(self):
+        return self.threadspin.GetValue()
+
 
 class Mainframe(wx.Frame):
     def __init__(self, parent, id, title):
-        wx.Frame.__init__(self, parent, id, title, size=(1000, 680))
+        wx.Frame.__init__(self, parent, id, title, size=(1000, 750))
         panel = wx.Panel(self, -1)
         self.inpanel = InputPanel(panel, -1)
         self.progpanel = ProgPanel(panel, -1)
@@ -240,7 +303,8 @@ class Mainframe(wx.Frame):
         self.Show(True)
 
 
-def run():
+def run_gui():
     app = wx.App(False)
-    program = Mainframe(None, -1, "title")
+    program = Mainframe(None, -1, "Proteogenomics Mycobacterium")
     app.MainLoop()
+

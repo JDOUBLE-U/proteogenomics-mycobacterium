@@ -14,12 +14,12 @@ __author__ = 'Jeroen'
 
 
 def delete_previous_results():
-    out_folders = [out_folder for out_folder in os.listdir('..\\' + 'analysis_pipeline')
+    out_folders = [out_folder for out_folder in os.listdir('..\\analysis_pipeline')
                    if out_folder.endswith('_out')]
     for out_folder in out_folders:
         files = os.listdir(out_folder)
         for file_name in files:
-            os.remove(out_folder + '/' + file_name)
+            os.remove(out_folder + '\\' + file_name)
 
 
 def get_mzxmls(mzxml_folder):
@@ -48,8 +48,8 @@ def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, s
         msconvert_executable = 'cd ..\\msconvert& msconvert.exe'
     # Linux and Mac executables
     else:
-        sixpack_executable = './EMBOSS_sixpack_65/linux_sixpack'
-        comet_executable = '../Comet_20151/comet.2015011.linux.exe'
+        sixpack_executable = '.\\EMBOSS_sixpack_65\\linux_sixpack'
+        comet_executable = '..\\Comet_20151\\comet.2015011.linux.exe'
         xinteract_executable = 'xxx'
         msconvert_executable = 'xxx'
 
@@ -96,11 +96,11 @@ def main(clear_prev_results, ms_run_code, on_sixframe, codon_table, on_digest, s
 
 
 if __name__ == '__main__':
-    wx_gui.run()
+    wx_gui.run_gui()
 
     start_time = timeit.default_timer()
-    main(True, "M_marium_spectra", True, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\",
-         '..\\' + 'GitHub_test_files\\M_marium_proteome.fasta',
-         '..\\' + 'GitHub_test_files\\M_tuberculosis_genome.fasta', 7, float(0.95), 1, 1, 6, 8)
+    main(True, "M_marium_spectra", False, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\",
+         '..\\GitHub_test_files\\M_marium_proteome.fasta',
+         '..\\GitHub_test_files\\M_tuberculosis_genome.fasta', 7, float(0.95), 1, 1, 6, 8)
     stop_time = timeit.default_timer()
     print("The Pipeline took %i seconds to run\n" % stop_time)

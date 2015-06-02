@@ -2,8 +2,8 @@ from unittest import TestCase
 
 from Bio import SeqIO
 
-from ProteinProphetParser import XinteractParser
-from ProteinProphetParser.XinteractParser import ProteinGroup
+from XinteractParser import XinteractParser
+from XinteractParser.XinteractParser import ProteinGroup
 
 # TODO make file references relative
 

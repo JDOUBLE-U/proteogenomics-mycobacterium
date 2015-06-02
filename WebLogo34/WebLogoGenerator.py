@@ -15,7 +15,7 @@ Instructions:
 """
 
 
-class WebLogoGenerator():
+class WebLogoGenerator:
     """
     ...
 
