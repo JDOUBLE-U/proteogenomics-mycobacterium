@@ -16,7 +16,7 @@ import os
 
 
 def run_sixpack(genome_file, executable, on_platform, min_prot_length, codon_table):
-    print("Running EMBOSS Sixpack")
+    # print("Running EMBOSS Sixpack")
 
     fasta_out = "..\\" + "analysis_pipeline\\sixpack_out" + genome_file[genome_file.rfind("\\"):-len(
         ".fasta")] + "_six_frame.fasta"

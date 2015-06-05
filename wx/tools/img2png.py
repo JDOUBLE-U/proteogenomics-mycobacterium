@@ -45,7 +45,7 @@ def main():
     if wx.GetApp() is None:
         global app
         app = wx.App()
-    img2img.main(sys.argv[1:], wx.BITMAP_TYPE_PNG, ".png", __doc__)
+    img2img.run_pipeline(sys.argv[1:], wx.BITMAP_TYPE_PNG, ".png", __doc__)
 
 if __name__ == '__main__':
     main()

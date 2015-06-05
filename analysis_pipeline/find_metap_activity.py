@@ -133,11 +133,11 @@ def write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db):
 #      "MS/MS Count"])
 
 
-def save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
+def save_hit(cleavage_loc, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
              maxquant_csv_writer):
     # Write a multiple fasta file with proteis within the given motif range
     prot_seq = SeqRecord(
-        Seq(prot.get_seq(protein_db)[motif_range_start:motif_range_end], generic_protein),
+        Seq(prot.get_seq(protein_db)[cleavage_loc:motif_range_end + 1], generic_protein),
         id=prot.get_prot_name(),
         description=prot.get_descr())
     SeqIO.write(prot_seq, weblogo_in_file, "fasta")
@@ -149,7 +149,7 @@ def save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_fi
     write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db)
 
 
-def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, prots, protein_db, weblogo_in_path,
+def find_metap_activity(min_prob, cleavage_loc, motif_range_end, prots, protein_db, weblogo_in_path,
                         readable_out_path, maxquant_csv_writer):
     found_metap_activity = False
 
@@ -168,7 +168,7 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
 
                 if pep_pos == cleavage_loc:
                     found_metap_activity = True
-                    save_hit(motif_range_start, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
+                    save_hit(cleavage_loc, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
                              maxquant_csv_writer)
 
         if not found_metap_activity:
@@ -178,7 +178,7 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_e
         print('None of the prot met the given critera.')
 
 
-def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob, cleavage_loc, motif_range_start,
+def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob, cleavage_loc,
                        motif_range_end):
     protxml_name = prot_prophet_xml[prot_prophet_xml.rfind("\\"):prot_prophet_xml.find(".")]
 
@@ -207,8 +207,7 @@ def run_metap_pipeline(ms_run_code, prot_prophet_xml, protein_db_path, min_prob,
     prots = [prot for prot in prot_xml_parser.get_prot_groups()]
     weblogo_generator = WebLogoGenerator(weblogos_out_path)
 
-    print("Parsing prot.xml")
-    find_metap_activity(min_prob, cleavage_loc, motif_range_start, motif_range_end, prots, protein_db, weblogo_in_name,
+    find_metap_activity(min_prob, cleavage_loc, motif_range_end, prots, protein_db, weblogo_in_name,
                         readable_out_name, maquant_csv_writer)
 
     weblogo_generator.create_weblogo(weblogo_in_name)

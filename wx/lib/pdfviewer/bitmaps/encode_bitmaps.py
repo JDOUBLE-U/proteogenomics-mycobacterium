@@ -33,5 +33,5 @@ command_lines = [
 if __name__ == "__main__":
     for line in command_lines:
         args = line.split()
-        img2py.main(args)
+        img2py.run_pipeline(args)
 
