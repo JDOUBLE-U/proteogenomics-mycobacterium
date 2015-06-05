@@ -133,11 +133,11 @@ def write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db):
 #      "MS/MS Count"])
 
 
-def save_hit(cleavage_loc, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
+def save_hit(cleavage_loc, motif_len, prot, protein_db, weblogo_in_file, readable_out_file,
              maxquant_csv_writer):
     # Write a multiple fasta file with proteis within the given motif range
     prot_seq = SeqRecord(
-        Seq(prot.get_seq(protein_db)[cleavage_loc:motif_range_end + 1], generic_protein),
+        Seq(prot.get_seq(protein_db)[cleavage_loc:cleavage_loc + motif_len], generic_protein),
         id=prot.get_prot_name(),
         description=prot.get_descr())
     SeqIO.write(prot_seq, weblogo_in_file, "fasta")
@@ -149,7 +149,7 @@ def save_hit(cleavage_loc, motif_range_end, prot, protein_db, weblogo_in_file, r
     write_maxquant_result_hit(maxquant_csv_writer, prot, protein_db)
 
 
-def find_metap_activity(min_prob, cleavage_loc, motif_range_end, prots, protein_db, weblogo_in_path,
+def find_metap_activity(min_prob, cleavage_loc, motif_len, prots, protein_db, weblogo_in_path,
                         readable_out_path, maxquant_csv_writer):
     found_metap_activity = False
 
@@ -168,7 +168,7 @@ def find_metap_activity(min_prob, cleavage_loc, motif_range_end, prots, protein_
 
                 if pep_pos == cleavage_loc:
                     found_metap_activity = True
-                    save_hit(cleavage_loc, motif_range_end, prot, protein_db, weblogo_in_file, readable_out_file,
+                    save_hit(cleavage_loc, motif_len, prot, protein_db, weblogo_in_file, readable_out_file,
                              maxquant_csv_writer)
 
         if not found_metap_activity:

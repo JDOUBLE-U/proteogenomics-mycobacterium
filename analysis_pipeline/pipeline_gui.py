@@ -1,6 +1,7 @@
 # import modules
-import os
 import sys
+sys.path.append('..\\')
+import os
 
 import wx
 from analysis_pipeline import preprocess_db
@@ -80,7 +81,7 @@ def run_pipeline(clear_prev_results, spectra_folder_location, output_folder, pro
     comet_pep_xmls = []
     mzxmls = get_mzxmls(spectra_folder_location)
     for mzxml in mzxmls:
-        comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml))
+        comet_pep_xmls.append(comet.run_comet(comet_executable, processed_prot_db, mzxml, nr_threads))
 
     ## xinteract ##
     xinteact.run_xinteract(output_folder, xinteract_executable, comet_pep_xmls, min_pep_length, nr_threads)
@@ -99,8 +100,6 @@ class ProgPanel(wx.Panel):
         self.SetFont(self.font)
         self.mainbox = wx.BoxSizer()
         self.progtext = wx.TextCtrl(self, -1, "", style=wx.TE_READONLY | wx.TE_MULTILINE)
-        #        self.progresstext.SetBackgroundColour("BLACK")
-        #        self.progresstext.SetForegroundColour("WHITE")
         self.mainbox.Add(self.progtext, 1, wx.EXPAND)
         sys.stdout = self.progtext
         self.SetSizer(self.mainbox)
@@ -120,18 +119,18 @@ class InputPanel(wx.Panel):
         self.mainbox.AddSpacer(3)
 
         ## Select spectra folder
-        self.vbox.Add(wx.StaticText(self, -1, "Spectra folder location"))
-        self.specfol = wx.DirPickerCtrl(self, -1, "", "Select spectra folder")
+        self.vbox.Add(wx.StaticText(self, -1, "MS/MS Spectra folder location"))
+        self.specfol = wx.DirPickerCtrl(self, -1, "", "Select MS/MS spectra folder")
         self.vbox.Add(self.specfol, 0, wx.EXPAND)
 
         ## Name of output files
-        self.vbox.Add(wx.StaticText(self, -1, "Name of output files"))
+        self.vbox.Add(wx.StaticText(self, -1, "Prefix name of output files"))
         self.namectrl = wx.TextCtrl(self, -1, "")
         self.vbox.Add(self.namectrl, 0, wx.EXPAND)
         self.vbox.AddSpacer(5)
 
         ## Six frame or not
-        self.vbox.Add(wx.StaticText(self, -1, "Use six-frame translation?"))
+        self.vbox.Add(wx.StaticText(self, -1, "Analyse on the six-frame translation of the genome?"))
         self.radio_no = wx.RadioButton(self, -1, "No", style=wx.RB_GROUP)
         self.radio_yes = wx.RadioButton(self, -1, "Yes")
         self.sixchoice = False
@@ -145,22 +144,22 @@ class InputPanel(wx.Panel):
         self.vbox.AddSpacer(5)
 
         ## Proteome location
-        self.prottext = wx.StaticText(self, -1, "Proteome location")
+        self.prottext = wx.StaticText(self, -1, "Proteome file location")
         self.vbox.Add(self.prottext, 0, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
-        self.protfol = wx.DirPickerCtrl(self, -1, "", "Select proteome folder")
+        self.protfol = wx.FilePickerCtrl(self, -1, "", "Select proteome file")
         self.vbox.Add(self.protfol, 0, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
 
         ## Genome location if using six frame
-        self.genotext = wx.StaticText(self, -1, "Genome location")
+        self.genotext = wx.StaticText(self, -1, "Genome file location")
         self.vbox.Add(self.genotext, 0, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
         self.vbox.Hide(self.genotext)
-        self.genofol = wx.FilePickerCtrl(self, -1, "", "Select Genome location")
+        self.genofol = wx.FilePickerCtrl(self, -1, "", "Select Genome file")
         self.vbox.Add(self.genofol, 0, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
         self.vbox.Hide(self.genofol)
         self.Layout()
 
         ## startcodons
-        self.codontext = wx.StaticText(self, -1, "Codon table")
+        self.codontext = wx.StaticText(self, -1, "Genetics code used for the translation")
         self.vbox.Add(self.codontext, 0, wx.EXPAND | wx.RESERVE_SPACE_EVEN_IF_HIDDEN)
         self.vbox.Hide(self.codontext)
         self.choices = ["Standard", "Standard (with alternative initiation codons)",
@@ -189,9 +188,9 @@ class InputPanel(wx.Panel):
         self.vbox.AddSpacer(5)
 
         ## Maximum error rate
-        self.vbox.Add(wx.StaticText(self, -1, "Maximum error rate"))
-        self.radio_1 = wx.RadioButton(self, -1, "1%", style=wx.RB_GROUP)
-        self.radio_5 = wx.RadioButton(self, -1, "5%")
+        self.vbox.Add(wx.StaticText(self, -1, "Maximum peptide error rate"))
+        self.radio_1 = wx.RadioButton(self, -1, "1%")
+        self.radio_5 = wx.RadioButton(self, -1, "5%", style=wx.RB_GROUP)
         self.maxerrbox = wx.BoxSizer()
         self.maxerrbox.Add(self.radio_1, 0, wx.EXPAND)
         self.maxerrbox.Add(wx.StaticText(self, -1, "   "), 0)
@@ -209,15 +208,15 @@ class InputPanel(wx.Panel):
         self.vbox.AddSpacer(5)
 
         ## cleavage location
-        self.vbox.Add(wx.StaticText(self, -1, "Cleavage location"))
+        self.vbox.Add(wx.StaticText(self, -1, "Specific starting location of peptide on protein"))
         self.cleavespin = wx.SpinCtrl(self, -1, "1", min=1)
         self.vbox.Add(self.cleavespin, 0, wx.SHAPED)
         self.vbox.AddSpacer(5)
 
         ## Digest before starting
         self.vbox.Add(wx.StaticText(self, -1, "Digest proteome database with Trypsin before starting?"))
-        self.digradio_n = wx.RadioButton(self, -1, "No", style=wx.RB_GROUP)
-        self.digradio_y = wx.RadioButton(self, -1, "Yes")
+        self.digradio_y = wx.RadioButton(self, -1, "Yes", style=wx.RB_GROUP)
+        self.digradio_n = wx.RadioButton(self, -1, "No")
         self.digestchoice = False
         self.digestbox = wx.BoxSizer()
         self.digestbox.Add(self.digradio_n, 0, wx.EXPAND)
@@ -229,7 +228,7 @@ class InputPanel(wx.Panel):
         self.vbox.AddSpacer(5)
 
         ## Number of threads
-        self.vbox.Add(wx.StaticText(self, -1, "Number of threads to use"))
+        self.vbox.Add(wx.StaticText(self, -1, "Number of CPU-threads to use"))
         self.threadspin = wx.SpinCtrl(self, -1, "8", min=1, max=100)
         self.vbox.Add(self.threadspin, 0, wx.SHAPED)
         self.vbox.AddSpacer(5)
@@ -325,14 +324,6 @@ class InputPanel(wx.Panel):
     def GetNrThreads(self):
         return self.threadspin.GetValue()
 
-    def onStart(self, event):
-        if self.checkInputs():
-            run_pipeline(True, self.GetSpectraFolder(), self.GetOutputNames(),
-                         self.GetProteomeFile(), self.GetOnSixframe(),
-                         self.GetGenomeFile(), self.GetCodonTable(), self.GetMotifLen(), float(0.95),
-                         self.GetMinPepLen(), self.GetCleavageLoc(), self.GetOnDigest(), self.GetNrThreads())
-            sys.exit()
-
     def checkInputs(self):
         if self.namectrl.GetValue().isalnum():
             return True
@@ -353,6 +344,14 @@ class InputPanel(wx.Panel):
                         pair = pair.split(":")
                         self.codondict[pair[0]] = pair[1]
                 linenum += 1
+
+    def onStart(self, event):
+        if self.checkInputs():
+            run_pipeline(True, self.GetSpectraFolder(), self.GetOutputNames(),
+                         self.GetProteomeFile(), self.GetOnSixframe(),
+                         self.GetGenomeFile(), self.GetCodonTable(), self.GetMotifLen(), float(0.95),
+                         self.GetMinPepLen(), self.GetCleavageLoc(), self.GetOnDigest(), self.GetNrThreads())
+            sys.exit()
 
 
 class Mainframe(wx.Frame):
@@ -376,8 +375,5 @@ if __name__ == "__main__":
     app.MainLoop()
 
 # start_time = timeit.default_timer()
-# main(True, "M_marium_spectra", False, 11, True, "C:\\Users\\Jeroen\\Desktop\\a\\",
-#      '..\\GitHub_test_files\\M_marium_proteome.fasta',
-#      '..\\GitHub_test_files\\M_tuberculosis_genome.fasta', 7, float(0.95), 1, 1, 6, 8)
 # stop_time = timeit.default_timer()
 # print("The Pipeline took %i seconds to run\n" % stop_time)

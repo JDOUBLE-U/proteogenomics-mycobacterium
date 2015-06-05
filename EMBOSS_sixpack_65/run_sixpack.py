@@ -16,36 +16,25 @@ import os
 
 
 def run_sixpack(genome_file, executable, on_platform, min_prot_length, codon_table):
-    # print("Running EMBOSS Sixpack")
 
     fasta_out = "..\\" + "analysis_pipeline\\sixpack_out" + genome_file[genome_file.rfind("\\"):-len(
         ".fasta")] + "_six_frame.fasta"
-    # visual_out = fasta_out[:-len(".fasta")] + ".txt"
 
     # TODO perhaps add the "features format -fformat1" parameter for custom fasta descriptors?
     os.system(executable + " -sequence %s"
-                           " -sformat1 fasta"
-                           " -snucleotide1"
-                           " -supper1"
-                           " -table %i"
-                           " -firstorf"
-                           " -lastorf"
+                           " -sformat1 fasta"  # Input sequence format
+                           " -snucleotide1"  # Sequence is nucleotide
+                           " -supper1"  # Make upper case
+                           " -table %i"  # Genetics code used for the translation
+                           " -firstorf"  # Count the beginning of a sequence as a possible ORF, even if it's inferior to the minimal ORF size.
+                           " -lastorf"  # Count the end of a sequence as a possible ORF, even if it's not finishing with a STOP, or inferior to the minimal ORF size.
                            " -outseq %s"
-                           " -osformat fasta"
-                           " -osname %s"
-                           " -reverse"
-                           " -orfminsize %i"
-                           " -number"
-                           " -width 120"
-                           " -length 0"
-                           " -margin 10"
-                           " -name"
-                           " -description"
-                           " -offset 1"
-                           " -nohtml"
-                           " -auto"
-                           " -verbose"
-                           " -mstart"  # Make optional?
+                           " -osformat fasta"  # Output seq format
+                           " -osname %s"  # Base file name
+                           " -reverse"  # Display also the translation of the DNA sequence in the 3 reverse frames
+                           " -orfminsize %i"  # Minimum size of Open Reading Frames (ORFs) to display in the translations.
+                           " -auto"  # Turn off prompts
+                           " -mstart"  # Displays only ORFs starting with an M
               % (genome_file, codon_table, fasta_out, on_platform, min_prot_length))
 
     return fasta_out
