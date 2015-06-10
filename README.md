@@ -3,6 +3,7 @@ Written for Python 3.4.*
 
 Used software:
 - ProjectPhoenix (next-gen WxPython)
+- SASHIMI 4.8.0
 - Comet version 2015.01 rev. 1
 - EMBOSS sixpack 6.5
 - BioPython 1.65

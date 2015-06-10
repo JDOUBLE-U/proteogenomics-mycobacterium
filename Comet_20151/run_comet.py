@@ -3,14 +3,12 @@ __author__ = 'Jeroen'
 import os
 
 
-def run_comet(comet_exec, prot_db, mzxml, nr_threads, peptide_mass_tolerance=3.00, peptide_mass_units=0, isotope_error=0):
-
-    params_file = "..\\" + "analysis_pipeline\\Comet_params\\comet.params.low-low.ion-trap"
-
+def run_comet(comet_exec, prot_db, mzxml, nr_threads, peptide_mass_tolerance=3.00, peptide_mass_units=0,
+              isotope_error=0):
     temp_comet_params_file_location = "..\\analysis_pipeline\\Comet_params\\temp_comet_params_file"
 
     peptide_mass_tolerance_param = "peptide_mass_tolerance = %f" % peptide_mass_tolerance
-    peptide_mass_units_param = "peptide_mass_units = %i" % peptide_mass_units # 0=amu, 1=mmu, 2=ppm"
+    peptide_mass_units_param = "peptide_mass_units = %i" % peptide_mass_units  # 0=amu, 1=mmu, 2=ppm"
     isotope_error_param = "isotope_error = %i" % isotope_error  # 0=off, 1=on -1/0/1/2/3 (standard C13 error), 2= -8/-4/0/4/8 (for +4/+8 labeling)
     num_threads = "num_threads = %i" % nr_threads
 
@@ -171,7 +169,8 @@ add_Z_user_amino_acid = 0.0000         # added to Z - avg.   0.0000, mono.   0.0
 7.  CNBr                   1      M           -
 8.  Glu_C                  1      DE          P
 9.  PepsinA                1      FL          P
-10. Chymotrypsin           1      FWYL        P""" % (num_threads, peptide_mass_tolerance_param, peptide_mass_units_param, isotope_error_param)
+10. Chymotrypsin           1      FWYL        P""" % (
+    num_threads, peptide_mass_tolerance_param, peptide_mass_units_param, isotope_error_param)
 
     temp_comet_params_file = open(temp_comet_params_file_location, "w+")
     temp_comet_params_file.write(temp_comet_params)
