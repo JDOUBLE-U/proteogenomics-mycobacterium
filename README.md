@@ -1,5 +1,5 @@
 # Proteogenomics Motifier
-Written for Python 3.4.*
+Written for Python 3.4.* (x86)
 
 Used software/techniques:
 - ProjectPhoenix 3.0.3 (next-gen WxPython)
@@ -13,10 +13,10 @@ Used software/techniques:
 - lxml 3.4.0
 - ProteoWizard 3.0.7414 msconvert.exe
 
-Requirements:
-- 64-bit Windows 7 OS
-- Python 3.4.3 [https://www.python.org/ftp/python/3.4.3/python-3.4.3.amd64.msi]
-- Trans-Proteomic Pipeline (philae) 4.8.0 [http://sourceforge.net/projects/sashimi/files/Trans-Proteomic%20Pipeline%20%28TPP%29/TPP%20v4.8%20%28philae%29%20rev%200/TPP_Setup_4.8.0.exe/download]
+Requires and has been tested with:
+- Windows 7 64-bit
 - ActivePerl 5.12.3 [https://code.google.com/p/projecteqemu/downloads/detail?name=ActivePerl-5.12.3.1204-MSWin32-x86-294330.msi]
-- Microsoft Visual C++ 2010 Redistributable Package (x64) [http://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe]
+- Trans-Proteomic Pipeline (philae) 4.8.0 [http://sourceforge.net/projects/sashimi/files/Trans-Proteomic%20Pipeline%20%28TPP%29/TPP%20v4.8%20%28philae%29%20rev%200/TPP_Setup_4.8.0.exe/download]
+- Python 3.4.3 [https://www.python.org/ftp/python/3.4.3/python-3.4.3.msi]
+
 - Ghostscript 9.16 for Windows (64 bit) [http://downloads.ghostscript.com/public/gs916w64.exe]

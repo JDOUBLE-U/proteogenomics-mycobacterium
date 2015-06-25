@@ -3,12 +3,12 @@ __author__ = 'Jeroen'
 import os
 
 
-def run_comet(comet_exec, prot_db, mzxml, nr_threads, peptide_mass_tolerance=3.00, peptide_mass_units=0,
-              isotope_error=0):
+def run_comet(comet_exec, processed_prot_db, mzxml, mass_tolerance, pep_mass_unit, isotope_error, enzyme_choice, allowed_missed_cleavage,
+              nr_threads):
     temp_comet_params_file_location = "..\\analysis_pipeline\\Comet_params\\temp_comet_params_file"
 
-    peptide_mass_tolerance_param = "peptide_mass_tolerance = %f" % peptide_mass_tolerance
-    peptide_mass_units_param = "peptide_mass_units = %i" % peptide_mass_units  # 0=amu, 1=mmu, 2=ppm"
+    peptide_mass_tolerance_param = "peptide_mass_tolerance = %i" % mass_tolerance
+    peptide_mass_units_param = "peptide_mass_units = %i" % pep_mass_unit  # 0=amu, 1=mmu, 2=ppm"
     isotope_error_param = "isotope_error = %i" % isotope_error  # 0=off, 1=on -1/0/1/2/3 (standard C13 error), 2= -8/-4/0/4/8 (for +4/+8 labeling)
     num_threads = "num_threads = %i" % nr_threads
 
@@ -32,9 +32,9 @@ mass_type_fragment = 1                 # 0=average masses, 1=monoisotopic masses
 #
 # search enzyme
 #
-search_enzyme_number = 1               # choose from list at end of this params file
+search_enzyme_number = %i               # choose from list at end of this params file
 num_enzyme_termini = 2                 # valid values are 1 (semi-digested), 2 (fully digested, default), 8 N-term, 9 C-term
-allowed_missed_cleavage = 2            # maximum value is 5; for enzyme search
+allowed_missed_cleavage = %i            # maximum value is 5; for enzyme search
 
 #
 # Up to 9 variable modifications are supported
@@ -106,7 +106,7 @@ max_fragment_charge = 3                # set maximum fragment charge state to an
 max_precursor_charge = 6               # set maximum precursor charge state to analyze (allowed max 9)
 nucleotide_reading_frame = 0           # 0=proteinDB, 1-6, 7=forward three, 8=reverse three, 9=all six
 clip_nterm_methionine = 0              # 0=leave sequences as-is; 1=also consider sequence w/o N-term methionine
-spectrum_batch_size = 2000             # max. # of spectra to search at a time; 0 to search the entire scan range in one loop
+spectrum_batch_size = 3000             # max. # of spectra to search at a time; 0 to search the entire scan range in one loop
 decoy_prefix = DECOY_                  # decoy entries are denoted by this string which is pre-pended to each protein accession
 output_suffix =                        # add a suffix to output base names i.e. suffix "-C" generates base-C.pep.xml from base.mzXML input
 
@@ -170,7 +170,7 @@ add_Z_user_amino_acid = 0.0000         # added to Z - avg.   0.0000, mono.   0.0
 8.  Glu_C                  1      DE          P
 9.  PepsinA                1      FL          P
 10. Chymotrypsin           1      FWYL        P""" % (
-    num_threads, peptide_mass_tolerance_param, peptide_mass_units_param, isotope_error_param)
+    num_threads, peptide_mass_tolerance_param, peptide_mass_units_param, isotope_error_param, enzyme_choice, allowed_missed_cleavage)
 
     temp_comet_params_file = open(temp_comet_params_file_location, "w+")
     temp_comet_params_file.write(temp_comet_params)
@@ -184,6 +184,6 @@ add_Z_user_amino_acid = 0.0000         # added to Z - avg.   0.0000, mono.   0.0
                            " -P%s"
                            " -N%s"
                            " -D%s"
-              % (mzxml, temp_comet_params_file_location, out_file, prot_db))
+              % (mzxml, temp_comet_params_file_location, out_file, processed_prot_db))
 
     return out_name + ".pep.xml"

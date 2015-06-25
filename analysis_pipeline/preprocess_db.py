@@ -12,7 +12,7 @@ def get_trypsin_digests(sequence, nr_allowed_overdigestions=2):
 
 
 def cleave_m(sequence):
-    # TODO Check may not be necessary
+    # TODO M Check may not be necessary
     if sequence[0].upper() == "M":
         return sequence[1:]
     else:
@@ -57,7 +57,6 @@ def cleave_m_and_digest(prot_db_name_in, min_seq_len):
 
             # Only save processed protein sequences with a given minnimum length
             if len(str(processed_seq)) >= min_seq_len:
-                comet_processed_db_out.write(
-                    ">%s %s\n%s\n" % (original_seq_req.id, original_seq_req.description, processed_seq))
+                comet_processed_db_out.write(">%s %s\n%s\n" % (original_seq_req.id, original_seq_req.description, processed_seq))
 
     return procesed_db
